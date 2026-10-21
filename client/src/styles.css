@@ -681,3 +681,70 @@ html.minimal .payqrcard{box-shadow:none}
 .paytimer.urgent{background:color-mix(in srgb,var(--danger) 12%,transparent);color:var(--danger);animation:pulse 1s ease-in-out infinite}
 @keyframes pulse{50%{opacity:.6}}
 @media (prefers-reduced-motion:reduce){.paytimer.urgent{animation:none}}
+
+/* =====================================================================
+   ปรับหน้าตาอัตโนมัติให้ใช้ได้ทั้งมือถือ แท็บเล็ต และคอม
+   ===================================================================== */
+body{margin:0} /* เดิมมีขอบขาว 8px จากค่าเริ่มต้นของเบราว์เซอร์ ทำให้ส่วนหัว/ท้ายหน้าเต็มจอไม่สุด */
+img,svg{max-width:100%}
+.acctm{display:none;position:relative}
+.acctbtn{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:var(--surface);color:var(--ink);padding:0}
+.acctbtn svg{width:20px;height:20px}
+.acctpanel{position:absolute;right:0;top:calc(100% + 8px);min-width:200px;background:var(--surface);color:var(--ink);border:1px solid var(--line);border-radius:12px;box-shadow:0 12px 30px rgba(0,0,0,.2);padding:6px;display:grid;z-index:40}
+.acctpanel a,.acctpanel button{display:block;text-align:left;padding:10px 12px;border-radius:8px;border:0;background:none;color:var(--ink);text-decoration:none;font-size:15px;width:100%}
+.acctpanel a:hover,.acctpanel button:hover{background:var(--bg)}
+.acctwho{padding:8px 12px;color:var(--muted);font-size:13px;border-bottom:1px solid var(--line);margin-bottom:4px}
+header.top .acctbtn{background:var(--glass);border-color:var(--glass-line);color:#fff}
+html.minimal header.top .acctbtn{background:#fff;border-color:var(--line);color:var(--ink)}
+
+@media (max-width:720px){
+  .acct{display:none}
+  .acctm{display:block}
+  .bar{gap:8px}
+  .logo{font-size:18px}
+  .logo svg{width:30px;height:30px}
+  .cartbtn{padding:8px 14px}
+  .infocards,.shopmain .infocards,.contactmain .infocards{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding-inline:0}
+  .infocards li{padding:14px;border-radius:16px}
+  .infocards li .cicon{width:40px;height:40px;border-radius:12px;margin-bottom:6px}
+  .infocards li div{font-size:13px;line-height:1.5}
+  .hero2{padding-block:32px 90px}
+  html.minimal .hero2{padding-block:36px 32px}
+  .tools{gap:10px}
+  .pagebar{flex-wrap:wrap;gap:8px}
+}
+@media (max-width:560px){
+  .grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;padding-bottom:28px}
+  .card{border-radius:14px}
+  html.minimal .card{border-radius:12px}
+  .tools .chips{flex-wrap:nowrap;overflow-x:auto;margin-inline:-16px;padding-inline:16px;padding-bottom:4px;scrollbar-width:none}
+  .tools .chips::-webkit-scrollbar{display:none}
+  .tools .chips button{white-space:nowrap;flex:none}
+  .tools .sort{width:100%;justify-content:space-between}
+}
+@media (min-width:1100px){
+  .grid{grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:20px}
+}
+
+/* หน้าแอดมิน/บัญชีบนจอเล็ก: ไม่ให้เนื้อหาดันจนเลื่อนข้าง */
+.ord,.panel,.ordlist>li{min-width:0}
+.ord-head{flex-wrap:wrap}
+.ord .meta,.ord-items span{overflow-wrap:anywhere}
+.dfilters{flex-wrap:wrap}
+.trackrow{flex-wrap:wrap}
+.actions{flex-wrap:wrap}
+@media (max-width:560px){
+  .trackrow input{flex:1 1 160px;min-width:0}
+  .actions button{flex:1 1 auto}
+  .adminmain{padding-top:12px}
+}
+@media (max-width:560px){
+  .stats{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+  .admintabs{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;padding-bottom:4px}
+  .admintabs::-webkit-scrollbar{display:none}
+  .admintabs a{white-space:nowrap;flex:none}
+}
+@media (max-width:560px){
+  .buy{flex-direction:column;align-items:stretch;gap:8px}
+  .buy .add{width:100%;white-space:nowrap;padding-inline:8px}
+}
