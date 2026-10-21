@@ -1,0 +1,120 @@
+import { useMemo, useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
+import Icon from '../components/Icon';
+import { baht } from '../data/products';
+import Header from '../components/Header';
+import SiteFooter from '../components/SiteFooter';
+import ProductCard from '../components/ProductCard';
+import CartDrawer from '../components/CartDrawer';
+import ProductDialog from '../components/ProductDialog';
+import { AGES, CATEGORIES } from '../data/products';
+import { useProducts } from '../context/ProductsContext';
+
+export default function Shop() {
+  const { products: PRODUCTS, loading, error, reload, shipping, returnDays } = useProducts();
+  // หมวดสินค้าอยู่ใน URL (/?cat=food) เมนู "สินค้า" ด้านบนจึงลิงก์เข้าหมวดได้ และรีเฟรชแล้วหมวดไม่หาย
+  const [sp, setSp] = useSearchParams();
+  const catParam = sp.get('cat');
+  const cat = CATEGORIES.some(([id]) => id === catParam) ? catParam : 'all';
+  const setCat = (id) => setSp(id === 'all' ? {} : { cat: id }, { replace: true });
+  const [age, setAge] = useState('all');
+  const [query, setQuery] = useState('');
+  const [sort, setSort] = useState('pop');
+  const [cartOpen, setCartOpen] = useState(() => sp.get('cart') === '1'); // ลิงก์จากปุ่ม "สั่งซ้ำ" เปิดตะกร้าให้เลย
+  const [openId, setOpenId] = useState(null); // สินค้าที่เปิดดูรายละเอียด/รีวิวอยู่
+
+  const list = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    const out = PRODUCTS.filter((p) => {
+      if (cat !== 'all' && p.cat !== cat) return false;
+      // กรองตามวัย: ใช้กับอาหารที่ระบุวัย ส่วนของอื่นเป็น "ทุกวัย" ให้แสดงเสมอ
+      if (age !== 'all' && p.age !== 'all' && p.age !== age) return false;
+      if (q && !(p.name + ' ' + p.size).toLowerCase().includes(q)) return false;
+      return true;
+    });
+    if (sort === 'low') out.sort((a, b) => a.price - b.price);
+    else if (sort === 'high') out.sort((a, b) => b.price - a.price);
+    else out.sort((a, b) => b.pop - a.pop);
+    return out;
+  }, [PRODUCTS, cat, age, query, sort]);
+
+  const ageHint = AGES.find((a) => a[0] === age)[2];
+
+  return (
+    <>
+      <Header query={query} onQuery={setQuery} onOpenCart={() => setCartOpen(true)} />
+
+      <section className="aurora hero2">
+        <span className="blob b1" aria-hidden="true" />
+        <span className="blob b2" aria-hidden="true" />
+        <span className="blob b3" aria-hidden="true" />
+        <div className="wrap hero2in">
+          <div>
+            <span className="pill">ร้านของแมวออนไลน์</span>
+            <h1>ของใช้ของกินสำหรับ<em>เจ้านาย</em> ครบในที่เดียว</h1>
+            <p>อาหารเม็ด อาหารเปียก ขนม ทรายแมว ของเล่น และที่ลับเล็บ ซื้อครบ {baht(shipping.freeFrom)} ส่งฟรี</p>
+            <div className="ctabtns left">
+              <a className="cbtn cb-hot" href="#products">เลือกซื้อสินค้า</a>
+              <Link className="cbtn cb-glass" to="/contact">ติดต่อเรา</Link>
+            </div>
+          </div>
+          <div className="finder">
+            <label id="ageLabel">เจ้านายอายุเท่าไหร่</label>
+            <div className="ages" role="group" aria-labelledby="ageLabel">
+              {AGES.map(([id, label]) => (
+                <button key={id} aria-pressed={age === id} onClick={() => setAge(id)}>{label}</button>
+              ))}
+            </div>
+            <small>{ageHint}</small>
+          </div>
+        </div>
+      </section>
+
+      <main className="wrap shopmain">
+        <ul className="infocards" aria-label="จุดเด่นของร้าน">
+          <li><span className="cicon"><Icon name="truck" /></span><b>ส่งฟรี</b><div>เมื่อซื้อครบ {baht(shipping.freeFrom)} (ปกติค่าส่ง {baht(shipping.fee)})</div></li>
+          <li><span className="cicon"><Icon name="star" /></span><b>รีวิวจากคนซื้อจริง</b><div>เขียนรีวิวได้หลังกดยืนยันรับสินค้าแล้วเท่านั้น</div></li>
+          <li><span className="cicon"><Icon name="undo" /></span><b>แจ้งคืนสินค้าได้</b><div>ภายใน {returnDays} วันหลังรับสินค้า พร้อมแนบรูปในเว็บ</div></li>
+          <li><span className="cicon"><Icon name="chat" /></span><b>ถามร้านได้ทุกเมื่อ</b><div><Link to="/contact">ติดต่อเรา</Link> ทางโทร LINE หรืออีเมล</div></li>
+        </ul>
+
+        <div className="tools" id="products">
+          <div className="chips" role="group" aria-label="หมวดสินค้า">
+            {CATEGORIES.map(([id, label]) => (
+              <button key={id} aria-pressed={cat === id} onClick={() => setCat(id)}>{label}</button>
+            ))}
+          </div>
+          <label className="sort">
+            เรียง
+            <select value={sort} onChange={(e) => setSort(e.target.value)}>
+              <option value="pop">แนะนำ</option>
+              <option value="low">ราคาต่ำไปสูง</option>
+              <option value="high">ราคาสูงไปต่ำ</option>
+            </select>
+          </label>
+        </div>
+
+        <p className="count">แสดง {list.length} จาก {PRODUCTS.length} รายการ</p>
+        <div className="grid">
+          {loading ? (
+            <div className="empty">กำลังโหลดสินค้า...</div>
+          ) : error ? (
+            <div className="empty">
+              โหลดสินค้าไม่สำเร็จ: {error}
+              <div><button className="add" style={{ marginTop: 12 }} onClick={reload}>ลองใหม่</button></div>
+            </div>
+          ) : list.length === 0 ? (
+            <div className="empty">ไม่พบสินค้าที่ตรงกับตัวกรอง ลองล้างคำค้นหรือเลือกหมวดอื่น</div>
+          ) : (
+            list.map((p) => <ProductCard key={p.id} product={p} onOpen={setOpenId} />)
+          )}
+        </div>
+      </main>
+
+      <SiteFooter />
+
+      <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
+      {openId && <ProductDialog productId={openId} onClose={() => setOpenId(null)} />}
+    </>
+  );
+}

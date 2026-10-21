@@ -1,0 +1,31 @@
+{
+  "name": "cat-shop",
+  "version": "0.1.0",
+  "private": true,
+  "description": "ร้านขายของแมว: หน้าร้าน + สมัคร/เข้าสู่ระบบด้วย MongoDB",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "client:install": "npm --prefix client install",
+    "client:dev": "npm --prefix client run dev",
+    "build": "npm --prefix client run build",
+    "deploy:build": "npm install && npm --prefix client install --include=dev && npm --prefix client run build",
+    "seed": "node scripts/seed-products.js",
+    "make-admin": "node scripts/make-admin.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "cookie-parser": "^1.4.6",
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2",
+    "express-rate-limit": "^7.4.0",
+    "google-auth-library": "^9.14.1",
+    "jsonwebtoken": "^9.0.2",
+    "mongoose": "^8.5.0",
+    "nodemailer": "^6.9.14"
+  }
+}

@@ -1,0 +1,24 @@
+# Render Blueprint: ใช้ได้ถ้าอัปโค้ดขึ้น GitHub แล้วเลือก "New > Blueprint" (หรือกรอกค่าเดียวกันเองตอนสร้าง Web Service)
+services:
+  - type: web
+    name: cat-shop
+    runtime: node
+    plan: free
+    buildCommand: npm install # หน้าเว็บ build และโฮสต์บน Vercel แยกต่างหาก Render รันเฉพาะ API
+    startCommand: npm start
+    healthCheckPath: /healthz
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: NODE_VERSION
+        value: 20
+      - key: MONGODB_URI
+        sync: false # ใส่เองใน Dashboard (connection string จาก Atlas)
+      - key: JWT_SECRET
+        generateValue: true # Render สุ่มให้
+      - key: TRUST_PROXY
+        value: 2 # หน้าเว็บอยู่ Vercel แล้วส่งต่อ /api มาที่นี่ (ผ่านพร็อกซี 2 ชั้น)
+      - key: APP_URL
+        sync: false # ที่อยู่หน้าเว็บบน Vercel เช่น https://cat-shop.vercel.app
+      - key: GOOGLE_CLIENT_ID
+        sync: false
