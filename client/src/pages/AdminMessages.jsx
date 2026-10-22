@@ -13,6 +13,7 @@ export default function AdminMessages() {
   const [loading, setLoading] = useState(true);
   const [err, setErr] = useState(null);
   const [busyId, setBusyId] = useState(null);
+  const [drafts, setDrafts] = useState({});
 
   const load = useCallback(() => {
     setLoading(true);
@@ -36,6 +37,21 @@ export default function AdminMessages() {
     try {
       const d = await api.admin.setMessageStatus(m.id, next);
       setList((l) => l.flatMap((x) => (x.id !== m.id ? [x] : status && d.message.status !== status ? [] : [d.message])));
+      window.dispatchEvent(new Event('messages-changed'));
+    } catch (e) {
+      setErr(e.message);
+    } finally {
+      setBusyId(null);
+    }
+  };
+
+  const sendReply = async (m) => {
+    setBusyId(m.id);
+    setErr(null);
+    try {
+      const d = await api.admin.replyMessage(m.id, drafts[m.id] || '');
+      setList((l) => l.flatMap((x) => (x.id !== m.id ? [x] : status && d.message.status !== status ? [] : [d.message])));
+      setDrafts((x) => ({ ...x, [m.id]: undefined }));
       window.dispatchEvent(new Event('messages-changed'));
     } catch (e) {
       setErr(e.message);
@@ -80,7 +96,21 @@ export default function AdminMessages() {
             </div>
             <p className="meta"><a href={'mailto:' + m.email + '?subject=' + encodeURIComponent('ตอบกลับจากร้านของแมวเหมียว')}>{m.email}</a></p>
             <p className="pre" style={{ margin: '8px 0' }}>{m.message}</p>
+            {m.reply && (
+              <div className="msgreply">
+                <b>คำตอบของร้าน</b> <span className="meta">{fmt(m.repliedAt)}</span>
+                <p className="pre">{m.reply}</p>
+              </div>
+            )}
+            <label className="replybox">
+              {m.reply ? 'แก้คำตอบ' : 'ตอบข้อความ'}
+              <textarea rows={3} maxLength={2000} value={drafts[m.id] !== undefined ? drafts[m.id] : m.reply || ''} onChange={(e) => setDrafts({ ...drafts, [m.id]: e.target.value })} />
+              <span className="hint">
+                {m.hasUser ? 'ลูกค้าล็อกอินตอนส่ง จะเห็นคำตอบในหน้า "บัญชีของฉัน"' : 'ลูกค้าไม่ได้ล็อกอิน จะไม่เห็นคำตอบในเว็บ ให้กดอีเมลด้านบนเพื่อตอบทางอีเมลด้วย'}
+              </span>
+            </label>
             <div className="actions">
+              <button className="submit" disabled={busyId === m.id || !(drafts[m.id] || '').trim()} onClick={() => sendReply(m)}>บันทึกและส่งคำตอบ</button>
               {m.status === 'new' && <button disabled={busyId === m.id} onClick={() => setStat(m, 'read')}>ทำเครื่องหมายว่าอ่านแล้ว</button>}
               {m.status !== 'replied' && <button disabled={busyId === m.id} onClick={() => setStat(m, 'replied')}>ตอบแล้ว</button>}
               {m.status !== 'new' && <button disabled={busyId === m.id} onClick={() => setStat(m, 'new')}>ทำเป็นข้อความใหม่</button>}

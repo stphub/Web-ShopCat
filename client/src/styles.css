@@ -749,3 +749,7 @@ html.minimal header.top .acctbtn{background:#fff;border-color:var(--line);color:
   .buy .add{width:100%;white-space:nowrap;padding-inline:8px}
 }
 .tag.msg-new{background:var(--sale);border-color:var(--sale);color:var(--on-sale)}
+.msgreply{margin:8px 0;padding:10px 12px;border-radius:12px;background:var(--bg);border:1px solid var(--line)}
+.msgreply p{margin:4px 0 0}
+.replybox{display:grid;gap:6px;margin-top:10px;font-size:14px}
+.replybox textarea{width:100%;box-sizing:border-box;font:inherit;padding:10px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink)}

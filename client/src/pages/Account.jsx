@@ -7,6 +7,7 @@ import ReturnRequest from '../components/ReturnRequest';
 import ReturnStatus from '../components/ReturnStatus';
 import PromptPayBox from '../components/PromptPayBox';
 import ProfilePanel from '../components/ProfilePanel';
+import MyMessages from '../components/MyMessages';
 import SecurityQuestionPanel from '../components/SecurityQuestionPanel';
 import { api } from '../api';
 import { baht } from '../data/products';
@@ -279,6 +280,8 @@ export default function Account() {
         </section>
 
         <SecurityQuestionPanel />
+
+        <MyMessages />
 
         <section className="panel" aria-labelledby="ord-title">
           <h2 id="ord-title">คำสั่งซื้อของฉัน</h2>

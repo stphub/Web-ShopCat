@@ -9,6 +9,8 @@ const messageSchema = new mongoose.Schema(
     user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', default: null },
     status: { type: String, enum: ['new', 'read', 'replied'], default: 'new', index: true },
     emailed: { type: Boolean, default: false },
+    reply: { type: String, default: '', maxlength: 2000 },
+    repliedAt: { type: Date, default: null },
   },
   { timestamps: true }
 );
@@ -18,6 +20,7 @@ messageSchema.set('toJSON', {
     ret.id = String(ret._id);
     delete ret._id;
     delete ret.__v;
+    ret.hasUser = !!ret.user; // ลูกค้าล็อกอินตอนส่งไหม (ตอบในเว็บได้เฉพาะกรณีนี้)
     delete ret.user;
     return ret;
   },
