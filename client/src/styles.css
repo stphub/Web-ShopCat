@@ -3,8 +3,8 @@
   --bg:#eef4f1; --surface:#ffffff; --ink:#14303a; --muted:#5b747c; --line:#d3e0dc;
   --accent:#f08a24; --on-accent:#2a1700; --sale:#d63f66; --on-sale:#ffffff; --ok:#1f7a55;
   --star:#b45f06; --star-empty:#c9d6d2; --series:#2a78d6; --danger:#b3263f; --warn:#8a5a00; --info:#1f5f9e;
-  --font-display:"Mitr","Noto Sans Thai",system-ui,sans-serif;
-  --font-body:"IBM Plex Sans Thai","Noto Sans Thai",system-ui,sans-serif;
+  --font-display:"Noto Sans Thai",system-ui,sans-serif;
+  --font-body:"Noto Sans Thai",system-ui,sans-serif;
 }
 @media (prefers-color-scheme: dark){
   :root:not([data-theme="light"]){
