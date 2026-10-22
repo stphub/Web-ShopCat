@@ -12,6 +12,7 @@ import AdminShell from './components/AdminShell';
 import AdminDashboard from './pages/AdminDashboard';
 import AdminOrders from './pages/AdminOrders';
 import AdminReturns from './pages/AdminReturns';
+import AdminMessages from './pages/AdminMessages';
 import AdminSettings from './pages/AdminSettings';
 import AdminProducts from './pages/AdminProducts';
 
@@ -31,6 +32,7 @@ export default function App() {
       <Route path="/admin" element={<AdminShell><AdminDashboard /></AdminShell>} />
       <Route path="/admin/orders" element={<AdminShell><AdminOrders /></AdminShell>} />
       <Route path="/admin/products" element={<AdminShell><AdminProducts /></AdminShell>} />
+      <Route path="/admin/messages" element={<AdminShell><AdminMessages /></AdminShell>} />
       <Route path="/admin/returns" element={<AdminShell><AdminReturns /></AdminShell>} />
       <Route path="/admin/settings" element={<AdminShell><AdminSettings /></AdminShell>} />
       <Route path="*" element={<Navigate to="/" replace />} />

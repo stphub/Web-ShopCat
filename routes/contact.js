@@ -1,5 +1,8 @@
 const express = require('express');
 const rateLimit = require('express-rate-limit');
+const mongoose = require('mongoose');
+const Message = require('../models/Message');
+const { requireAuth, requireAdmin } = require('./auth');
 const { sendMail } = require('../lib/mailer');
 const { getShopInfo } = require('../models/ShopInfo');
 
@@ -27,21 +30,29 @@ router.post('/', limiter, async (req, res) => {
     if (message.length < 5) return res.status(400).json({ error: 'กรุณาพิมพ์ข้อความอย่างน้อย 5 ตัวอักษร', field: 'message' });
     if (message.length > 2000) return res.status(400).json({ error: 'ข้อความยาวเกิน 2000 ตัวอักษร', field: 'message' });
 
-    // ผู้รับ: CONTACT_EMAIL ใน .env → อีเมลร้านที่แอดมินตั้งในหน้า "ตั้งค่าร้าน" → MAIL_FROM → SMTP_USER
-    const shop = await getShopInfo();
-    const to = process.env.CONTACT_EMAIL || shop.email || process.env.MAIL_FROM || process.env.SMTP_USER || 'ยังไม่ได้ตั้งอีเมลร้าน';
-    try {
-      // ตัดขึ้นบรรทัดใหม่ออกจากชื่อ/อีเมล กันการแทรกหัวอีเมล
-      await sendMail({
-        to,
-        replyTo: email.replace(/[\r\n]/g, ''),
-        subject: 'ข้อความจากหน้าติดต่อเรา: ' + name.replace(/[\r\n]/g, ' '),
-        text: 'จาก: ' + name + ' <' + email + '>\n\n' + message,
-      });
-    } catch (e) {
-      console.error('ส่งข้อความติดต่อไม่สำเร็จ:', e.message);
-      return res.status(502).json({ error: 'ส่งข้อความไม่สำเร็จ ลองใหม่อีกครั้งหรือติดต่อทางช่องทางอื่น' });
-    }
+    // เก็บลงฐานข้อมูลก่อนเสมอ แอดมินอ่านได้ที่หน้า "ข้อความ" แม้ส่งอีเมลไม่ได้
+    const doc = await Message.create({ name, email, message });
+
+    // แจ้งทางอีเมลเป็นของแถม: ไม่รอผลและไม่ทำให้การส่งล้มเหลว (รอสูงสุด 8 วินาที)
+    (async () => {
+      try {
+        const shop = await getShopInfo();
+        const to = process.env.CONTACT_EMAIL || shop.email || process.env.MAIL_FROM || process.env.SMTP_USER;
+        if (!to || !process.env.SMTP_HOST) return;
+        await Promise.race([
+          sendMail({
+            to,
+            replyTo: email.replace(/[\r\n]/g, ''),
+            subject: 'ข้อความจากหน้าติดต่อเรา: ' + name.replace(/[\r\n]/g, ' '),
+            text: 'จาก: ' + name + ' <' + email + '>\n\n' + message,
+          }),
+          new Promise((_, rej) => setTimeout(() => rej(new Error('หมดเวลา')), 8000)),
+        ]);
+        await Message.updateOne({ _id: doc._id }, { emailed: true });
+      } catch (e) {
+        console.error('แจ้งอีเมลข้อความติดต่อไม่สำเร็จ (ข้อความถูกเก็บไว้ในระบบแล้ว):', e.message);
+      }
+    })();
     res.json({ ok: true, message: 'ส่งข้อความถึงร้านแล้ว ขอบคุณที่ติดต่อ ร้านจะตอบกลับทางอีเมลที่ให้ไว้' });
   } catch (e) {
     console.error(e);
@@ -49,4 +60,55 @@ router.post('/', limiter, async (req, res) => {
   }
 });
 
+// ---------- แอดมิน: อ่านและจัดการข้อความ ----------
+const adminRouter = express.Router();
+adminRouter.use(requireAuth, requireAdmin);
+
+adminRouter.get('/', async (req, res) => {
+  try {
+    const q = {};
+    if (Message.STATUSES.includes(req.query.status)) q.status = req.query.status;
+    const list = await Message.find(q).sort({ createdAt: -1 }).limit(200);
+    res.json({ messages: list });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: 'เกิดข้อผิดพลาดที่เซิร์ฟเวอร์' });
+  }
+});
+
+adminRouter.get('/summary', async (req, res) => {
+  try {
+    res.json({ unread: await Message.countDocuments({ status: 'new' }) });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: 'เกิดข้อผิดพลาดที่เซิร์ฟเวอร์' });
+  }
+});
+
+adminRouter.patch('/:id', async (req, res) => {
+  try {
+    if (!mongoose.isValidObjectId(req.params.id)) return res.status(404).json({ error: 'ไม่พบข้อความ' });
+    const status = String(req.body.status || '');
+    if (!Message.STATUSES.includes(status)) return res.status(400).json({ error: 'สถานะไม่ถูกต้อง' });
+    const m = await Message.findByIdAndUpdate(req.params.id, { status }, { new: true });
+    if (!m) return res.status(404).json({ error: 'ไม่พบข้อความ' });
+    res.json({ message: m });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: 'เกิดข้อผิดพลาดที่เซิร์ฟเวอร์' });
+  }
+});
+
+adminRouter.delete('/:id', async (req, res) => {
+  try {
+    if (!mongoose.isValidObjectId(req.params.id)) return res.status(404).json({ error: 'ไม่พบข้อความ' });
+    await Message.deleteOne({ _id: req.params.id });
+    res.json({ ok: true });
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: 'เกิดข้อผิดพลาดที่เซิร์ฟเวอร์' });
+  }
+});
+
 module.exports = router;
+module.exports.adminRouter = adminRouter;

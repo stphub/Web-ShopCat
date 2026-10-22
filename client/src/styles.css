@@ -748,3 +748,4 @@ html.minimal header.top .acctbtn{background:#fff;border-color:var(--line);color:
   .buy{flex-direction:column;align-items:stretch;gap:8px}
   .buy .add{width:100%;white-space:nowrap;padding-inline:8px}
 }
+.tag.msg-new{background:var(--sale);border-color:var(--sale);color:var(--on-sale)}

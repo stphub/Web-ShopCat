@@ -9,6 +9,7 @@ export default function AdminShell({ children }) {
   const { user, loading, logout } = useAuth();
   const { pathname } = useLocation();
   const [pendingReturns, setPendingReturns] = useState(0);
+  const [unreadMsgs, setUnreadMsgs] = useState(0);
   const isAdmin = !!user && user.role === 'admin';
 
   // ตัวเลขคำขอคืนสินค้าที่รอตรวจ แสดงบนแท็บ (อัปเดตเมื่อเปลี่ยนหน้า หรือหน้าคำขอคืนแจ้งว่ามีการเปลี่ยน)
@@ -18,6 +19,14 @@ export default function AdminShell({ children }) {
     refresh();
     window.addEventListener('returns-changed', refresh);
     return () => window.removeEventListener('returns-changed', refresh);
+  }, [isAdmin, pathname]);
+
+  useEffect(() => {
+    if (!isAdmin) return undefined;
+    const refresh = () => api.admin.messagesSummary().then((d) => setUnreadMsgs(d.unread)).catch(() => {});
+    refresh();
+    window.addEventListener('messages-changed', refresh);
+    return () => window.removeEventListener('messages-changed', refresh);
   }, [isAdmin, pathname]);
 
   if (loading) return <div className="authwrap"><p className="sub">กำลังโหลด...</p></div>;
@@ -54,6 +63,7 @@ export default function AdminShell({ children }) {
         <NavLink to="/admin/orders">ออเดอร์</NavLink>
         <NavLink to="/admin/products">สินค้า</NavLink>
         <NavLink to="/admin/returns">คำขอคืนสินค้า{pendingReturns > 0 && <b className="tabbadge" aria-label={pendingReturns + ' รายการรอตรวจ'}>{pendingReturns}</b>}</NavLink>
+        <NavLink to="/admin/messages">ข้อความ{unreadMsgs > 0 && <b className="tabbadge" aria-label={unreadMsgs + ' ข้อความใหม่'}>{unreadMsgs}</b>}</NavLink>
         <NavLink to="/admin/settings">ตั้งค่าร้าน</NavLink>
       </nav>
       <main className="wrap adminmain">{children}</main>
