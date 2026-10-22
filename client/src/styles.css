@@ -764,3 +764,4 @@ html.minimal header.top .acctbtn{background:#fff;border-color:var(--line);color:
 .rvmbox h4{margin:16px 0 8px}
 .rvmlist{list-style:none;margin:0;padding:0;display:grid;gap:12px}
 .rvmlist>li{border-bottom:1px solid var(--line);padding-bottom:10px;display:grid;gap:4px;min-width:0;overflow-wrap:anywhere}
+.ord-items span.num{overflow-wrap:normal;white-space:nowrap;flex:none}

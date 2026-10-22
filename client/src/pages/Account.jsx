@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from 'react';
-import { Link, Navigate } from 'react-router-dom';
+import { Link, NavLink, Navigate } from 'react-router-dom';
 import PageBar from '../components/PageBar';
 import AddressFields from '../components/AddressFields';
 import OrderItemReview from '../components/OrderItemReview';
@@ -18,8 +18,10 @@ import { useCart } from '../context/CartContext';
 
 const EMPTY = { label: '', name: '', tel: '', line: '', isDefault: false };
 
-// หน้าบัญชีของฉัน: จัดการที่อยู่จัดส่งที่บันทึกไว้ และดูประวัติคำสั่งซื้อ
-export default function Account() {
+// view='profile' (/account): โปรไฟล์ ที่อยู่ ความปลอดภัย ข้อความถึงร้าน
+// view='orders' (/account/orders): คำสั่งซื้อของฉัน ชำระเงิน รับสินค้า รีวิว คืนสินค้า
+export default function Account({ view = 'profile' }) {
+  const isOrders = view === 'orders';
   const { user, loading } = useAuth();
   const { reload: reloadShop, returnDays, payMinutes, byId } = useProducts();
   const { change } = useCart();
@@ -91,16 +93,19 @@ export default function Account() {
 
   useEffect(() => {
     if (user) {
-      loadAddresses();
-      loadOrders();
-      loadReviews();
-      loadReturns();
+      if (isOrders) {
+        loadOrders();
+        loadReviews();
+        loadReturns();
+      } else {
+        loadAddresses();
+      }
     } else {
       setMyReviews({});
       setReturns([]);
       setReturnFor(null);
     }
-  }, [user, loadAddresses, loadOrders, loadReviews, loadReturns]);
+  }, [user, isOrders, loadAddresses, loadOrders, loadReviews, loadReturns]);
 
   if (loading) return <div className="authwrap"><p className="sub">กำลังโหลด...</p></div>;
   if (!user) return <Navigate to="/login" replace />;
@@ -230,10 +235,15 @@ export default function Account() {
 
   return (
     <div className="admin">
-      <PageBar title="บัญชีของฉัน" />
+      <PageBar title={isOrders ? 'คำสั่งซื้อของฉัน' : 'บัญชีของฉัน'} />
+      <nav className="admintabs wrap" aria-label="เมนูบัญชี">
+        <NavLink to="/account" end>โปรไฟล์</NavLink>
+        <NavLink to="/account/orders">คำสั่งซื้อของฉัน</NavLink>
+      </nav>
       <main className="wrap adminmain">
-        <ProfilePanel />
+        {!isOrders && <ProfilePanel />}
 
+        {!isOrders && (
         <section className="panel" aria-labelledby="addr-title">
           <h2 id="addr-title">ที่อยู่จัดส่งที่บันทึกไว้</h2>
           {addrErr && <div className="err" role="alert">{addrErr}</div>}
@@ -279,10 +289,13 @@ export default function Account() {
           </form>
         </section>
 
-        <SecurityQuestionPanel />
+        )}
 
-        <MyMessages />
+        {!isOrders && <SecurityQuestionPanel />}
 
+        {!isOrders && <MyMessages />}
+
+        {isOrders && (
         <section className="panel" aria-labelledby="ord-title">
           <h2 id="ord-title">คำสั่งซื้อของฉัน</h2>
           {ordErr && <div className="err" role="alert">{ordErr}</div>}
@@ -377,6 +390,7 @@ export default function Account() {
             </ul>
           )}
         </section>
+        )}
       </main>
     </div>
   );

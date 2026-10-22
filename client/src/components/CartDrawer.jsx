@@ -140,7 +140,7 @@ export default function CartDrawer({ open, onClose }) {
                 )}
                 <p className="note">
                   ชำระเงินแล้วแนบสลิปได้ที่นี่ หรือแนบทีหลังที่{' '}
-                  <Link to="/account" onClick={onClose}>บัญชีของฉัน</Link>{' '}
+                  <Link to="/account/orders" onClick={onClose}>คำสั่งซื้อของฉัน</Link>{' '}
                   เมื่อร้านตรวจสลิปและยืนยันแล้ว สถานะจะเปลี่ยนเป็น "ชำระเงินแล้ว"
                 </p>
               </div>

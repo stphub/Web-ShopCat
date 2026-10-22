@@ -271,7 +271,7 @@ export default function ProductDialog({ productId, onClose }) {
                       </p>
                     ) : !data.canReview ? (
                       <p className="note">
-                        รีวิวได้หลังจากที่คุณกดยืนยันรับสินค้านี้แล้ว ไปที่ <Link to="/account" onClick={onClose}>บัญชีของฉัน</Link> เลือกคำสั่งซื้อที่ร้านจัดส่งแล้ว แล้วกด "ยืนยันรับสินค้า"
+                        รีวิวได้หลังจากที่คุณกดยืนยันรับสินค้านี้แล้ว ไปที่ <Link to="/account/orders" onClick={onClose}>คำสั่งซื้อของฉัน</Link> เลือกคำสั่งซื้อที่ร้านจัดส่งแล้ว แล้วกด "ยืนยันรับสินค้า"
                       </p>
                     ) : (
                       <form onSubmit={submit} noValidate>

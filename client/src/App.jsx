@@ -29,6 +29,7 @@ export default function App() {
       <Route path="/help/:slug" element={<HelpPage />} />
       <Route path="/wishlist" element={<Wishlist />} />
       <Route path="/account" element={<Account />} />
+      <Route path="/account/orders" element={<Account view="orders" />} />
       <Route path="/admin" element={<AdminShell><AdminDashboard /></AdminShell>} />
       <Route path="/admin/orders" element={<AdminShell><AdminOrders /></AdminShell>} />
       <Route path="/admin/products" element={<AdminShell><AdminProducts /></AdminShell>} />

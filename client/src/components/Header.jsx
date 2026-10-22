@@ -38,6 +38,7 @@ function AccountMenu({ user, loading, logout, wishCount }) {
             <>
               <div className="acctwho">สวัสดี {user.nickname || user.name}</div>
               <Link role="menuitem" to="/account" onClick={close}>บัญชีของฉัน</Link>
+              <Link role="menuitem" to="/account/orders" onClick={close}>คำสั่งซื้อของฉัน</Link>
               <Link role="menuitem" to="/wishlist" onClick={close}>รายการโปรด{wishCount > 0 ? ` (${wishCount})` : ''}</Link>
               {user.role === 'admin' && <Link role="menuitem" to="/admin" onClick={close}>จัดการร้าน</Link>}
               <button type="button" role="menuitem" onClick={() => { close(); logout(); }}>ออกจากระบบ</button>
@@ -84,6 +85,7 @@ export default function Header({ query, onQuery, onOpenCart }) {
               <span className="who">สวัสดี {user.nickname || user.name}</span>
               <Link to="/wishlist">รายการโปรด{wish.count > 0 ? ` (${wish.count})` : ''}</Link>
               <Link to="/account">บัญชีของฉัน</Link>
+              <Link to="/account/orders">คำสั่งซื้อของฉัน</Link>
               {user.role === 'admin' && <Link to="/admin">จัดการร้าน</Link>}
               <button onClick={logout}>ออกจากระบบ</button>
             </>
