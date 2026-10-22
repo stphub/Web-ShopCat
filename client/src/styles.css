@@ -765,3 +765,41 @@ html.minimal header.top .acctbtn{background:#fff;border-color:var(--line);color:
 .rvmlist{list-style:none;margin:0;padding:0;display:grid;gap:12px}
 .rvmlist>li{border-bottom:1px solid var(--line);padding-bottom:10px;display:grid;gap:4px;min-width:0;overflow-wrap:anywhere}
 .ord-items span.num{overflow-wrap:normal;white-space:nowrap;flex:none}
+
+/* ===== หัวเว็บแบบ minimalist แถวเดียว: โลโก้ | เมนู ... ค้นหา | บัญชี | ตะกร้า (สีตามธีมเดิม) ===== */
+html:root header.top{border-bottom:1px solid var(--line)}
+html:root header.top .bar{max-width:1120px;gap:28px;padding-block:20px}
+html:root header.top .logo{font-size:17px;font-weight:600;gap:8px;flex:none}
+html:root header.top .logo svg{width:24px;height:24px}
+html:root header.top .sitenav{margin:0;padding:0;gap:4px;flex:none}
+html:root header.top .navitem{font-family:inherit;font-size:14px;font-weight:400;padding:6px 10px;border-bottom:0;opacity:.8}
+html:root header.top .navitem:hover,html:root header.top .navitem.on{opacity:1;color:inherit;border-bottom:0}
+html:root header.top .navitem.on{font-weight:600}
+html:root header.top .navitem .chev{width:10px;height:10px;opacity:.55}
+html:root header.top .search{flex:0 1 200px;margin-left:auto}
+html:root header.top .search input{background:transparent;border:0;border-bottom:1px solid var(--line);border-radius:0;padding:6px 0;font-size:14px;color:inherit;box-shadow:none}
+html:root header.top .search input:focus{outline:none;border-bottom-color:currentColor}
+html:root header.top .acct{gap:18px;flex-wrap:nowrap}
+html:root header.top .acct a{border:0;background:none;padding:6px 0;border-radius:0;font-size:14px;color:inherit}
+html:root header.top .acct a:hover{text-decoration:underline}
+html:root header.top .acct a.primary,html:root header.top .cartbtn{background:transparent;color:inherit;border:1px solid currentColor;border-radius:999px;padding:7px 18px;font-size:13px;font-weight:500;letter-spacing:.02em}
+html:root header.top .acct a.primary:hover{text-decoration:none}
+html:root header.top .acct a.primary:hover,html:root header.top .cartbtn:hover{background:rgba(255,255,255,.16)}
+html.minimal header.top .acct a.primary:hover,html.minimal header.top .cartbtn:hover{background:var(--ink);color:#fff;border-color:var(--ink)}
+html:root header.top .cartbtn{gap:8px}
+html:root header.top .cartbtn b{background:transparent;color:inherit;min-width:0;height:auto;padding:0;font-size:13px;font-weight:600}
+html:root header.top .acctm.member{display:block}
+html:root header.top .acctbtn{width:36px;height:36px;background:transparent;border-color:var(--line);color:inherit}
+@media (max-width:900px){
+  html:root header.top .bar{gap:14px}
+  html:root header.top .search{flex-basis:140px}
+}
+@media (max-width:720px){
+  html:root header.top .bar{flex-wrap:wrap;gap:10px 12px;padding-block:12px}
+  html:root header.top .logo{order:1;flex:1}
+  html:root header.top .acct{display:none}
+  html:root header.top .acctm{order:2;display:block}
+  html:root header.top .cartbtn{order:3}
+  html:root header.top .search{order:4;flex:1 1 100%;margin-left:0}
+  html:root header.top .sitenav{order:5;flex:1 1 100%;margin-inline:-10px}
+}

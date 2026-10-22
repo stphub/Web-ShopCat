@@ -28,7 +28,7 @@ function AccountMenu({ user, loading, logout, wishCount }) {
   if (loading) return null;
   const close = () => setOpen(false);
   return (
-    <div className="acctm" ref={box}>
+    <div className={'acctm ' + (user ? 'member' : 'guest')} ref={box}>
       <button type="button" className="acctbtn" aria-haspopup="menu" aria-expanded={open} aria-label={user ? 'เมนูบัญชีของ ' + (user.nickname || user.name) : 'เข้าสู่ระบบ / สมัครสมาชิก'} onClick={() => setOpen((v) => !v)}>
         {user ? <Avatar user={user} size={28} /> : <Icon name="user" />}
       </button>
@@ -68,28 +68,20 @@ export default function Header({ query, onQuery, onOpenCart }) {
           <span>ของแมวเหมียว</span>
         </Link>
 
+        <SiteNav />
+
         <div className="search">
           <input
             type="search"
             value={query}
             onChange={(e) => onQuery(e.target.value)}
-            placeholder="ค้นหา เช่น ปลาทูน่า ทราย ไม้ตกแมว"
+            placeholder="ค้นหาสินค้า"
             aria-label="ค้นหาสินค้า"
           />
         </div>
 
         <div className="acct" aria-live="polite">
-          {loading ? null : user ? (
-            <>
-              <Avatar user={user} size={28} />
-              <span className="who">สวัสดี {user.nickname || user.name}</span>
-              <Link to="/wishlist">รายการโปรด{wish.count > 0 ? ` (${wish.count})` : ''}</Link>
-              <Link to="/account">บัญชีของฉัน</Link>
-              <Link to="/account/orders">คำสั่งซื้อของฉัน</Link>
-              {user.role === 'admin' && <Link to="/admin">จัดการร้าน</Link>}
-              <button onClick={logout}>ออกจากระบบ</button>
-            </>
-          ) : (
+          {loading || user ? null : (
             <>
               <Link to="/login">เข้าสู่ระบบ</Link>
               <Link className="primary" to="/register">สมัครสมาชิก</Link>
@@ -103,7 +95,6 @@ export default function Header({ query, onQuery, onOpenCart }) {
           ตะกร้า <b className="num">{count}</b>
         </button>
       </div>
-      <SiteNav />
     </header>
   );
 }
