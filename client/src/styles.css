@@ -753,3 +753,14 @@ html.minimal header.top .acctbtn{background:#fff;border-color:var(--line);color:
 .msgreply p{margin:4px 0 0}
 .replybox{display:grid;gap:6px;margin-top:10px;font-size:14px}
 .replybox textarea{width:100%;box-sizing:border-box;font:inherit;padding:10px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink)}
+.rv-who{display:inline-flex;align-items:center;gap:8px;padding:0;border:0;background:none;color:inherit;font:inherit;cursor:pointer}
+.rv-who:hover .rv-name{text-decoration:underline}
+.rvmodal{position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.45);display:grid;place-items:center;padding:16px}
+.rvmbox{position:relative;background:var(--surface);color:var(--ink);border-radius:18px;width:min(520px,100%);max-height:86vh;overflow:auto;padding:20px}
+.rvmclose{position:absolute;top:8px;right:10px;width:36px;height:36px;border:0;border-radius:50%;background:var(--bg);color:var(--ink);font-size:22px;cursor:pointer}
+.rvmhead{display:flex;align-items:center;gap:14px;margin-bottom:14px;padding-right:36px}
+.rvmhead h3{margin:0}
+.rvmhead p{margin:2px 0 0}
+.rvmbox h4{margin:16px 0 8px}
+.rvmlist{list-style:none;margin:0;padding:0;display:grid;gap:12px}
+.rvmlist>li{border-bottom:1px solid var(--line);padding-bottom:10px;display:grid;gap:4px;min-width:0;overflow-wrap:anywhere}

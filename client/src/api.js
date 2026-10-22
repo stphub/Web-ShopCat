@@ -95,6 +95,7 @@ export const api = {
     list: (productId) => request('GET', '/products/' + productId + '/reviews'),
     save: (productId, b) => request('POST', '/products/' + productId + '/reviews', b),
     remove: (id) => request('DELETE', '/reviews/' + id),
+    reviewer: (reviewId) => request('GET', '/reviews/' + reviewId + '/reviewer'),
     uploadPhoto: (blob) => uploadImage(blob, '/api/reviews/images'),
   },
   admin: {

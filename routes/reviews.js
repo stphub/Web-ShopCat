@@ -3,7 +3,9 @@ const mongoose = require('mongoose');
 const Product = require('../models/Product');
 const Order = require('../models/Order');
 const Review = require('../models/Review');
+const { maskName } = Review;
 const Image = require('../models/Image');
+const User = require('../models/User');
 const rateLimit = require('express-rate-limit');
 const { detectType } = require('./images');
 
@@ -20,6 +22,15 @@ const photoOut = (ids) => (ids || []).map((id) => ({ id: String(id), url: '/api/
 const { requireAuth, optionalAuth } = require('./auth');
 
 const router = express.Router();
+
+// รูปโปรไฟล์ของผู้รีวิว (รูปที่อัปโหลดเอง หรือรูปจาก Google) ใช้เป็นแผนที่ userId -> url
+async function avatarMap(userIds) {
+  const ids = [...new Set(userIds.map(String))];
+  const users = await User.find({ _id: { $in: ids } }).select('avatar picture');
+  const m = new Map();
+  for (const u of users) m.set(String(u._id), u.avatar ? '/api/images/' + u.avatar : u.picture || null);
+  return m;
+}
 
 function sendError(res, e) {
   console.error(e);
@@ -73,14 +84,65 @@ router.get('/products/:id/reviews', optionalAuth, async (req, res) => {
       sum += d._id * d.n;
     }
     const viewer = req.user ? req.user._id : null;
+    const avatars = await avatarMap(list.map((r) => r.user));
     const mine = viewer ? list.find((r) => String(r.user) === String(viewer)) || (await Review.findOne({ product: pid, user: viewer })) : null;
     res.json({
       summary: { avg: count ? Math.round((sum / count) * 10) / 10 : 0, count, breakdown },
-      reviews: list.map((r) => r.toPublic(viewer)),
+      reviews: list.map((r) => r.toPublic(viewer, avatars.get(String(r.user)))),
       canReview: viewer ? Boolean(await hasPurchased(viewer, pid)) : false,
       myReview: mine ? { rating: mine.rating, comment: mine.comment, photos: photoOut(mine.photos) } : null,
       loggedIn: Boolean(viewer),
     });
+  } catch (e) {
+    sendError(res, e);
+  }
+});
+
+// โปรไฟล์ผู้รีวิว (กดจากชื่อในรีวิว): ทุกคนเห็นรูป ชื่อที่ปิดบังบางส่วน และสินค้าที่เคยรีวิว
+// แอดมินเห็นเพิ่ม: ชื่อเต็ม อีเมล และสินค้าที่เคยสั่งซื้อ (ประวัติการซื้อของลูกค้าไม่เปิดให้คนทั่วไปเห็น)
+router.get('/reviews/:id/reviewer', optionalAuth, async (req, res) => {
+  try {
+    if (!mongoose.isValidObjectId(req.params.id)) return res.status(404).json({ error: 'ไม่พบรีวิว' });
+    const r = await Review.findById(req.params.id);
+    if (!r) return res.status(404).json({ error: 'ไม่พบรีวิว' });
+    const isAdmin = !!req.user && req.user.role === 'admin';
+    const [user, reviews] = await Promise.all([
+      User.findById(r.user).select('name nickname avatar picture createdAt email'),
+      Review.find({ user: r.user }).sort({ createdAt: -1 }).limit(30),
+    ]);
+    const products = await Product.find({ _id: { $in: reviews.map((x) => x.product) } }).select('name');
+    const pname = new Map(products.map((p) => [String(p._id), p.name]));
+    const out = {
+      name: maskName(r.userName),
+      avatar: user ? (user.avatar ? '/api/images/' + user.avatar : user.picture || null) : null,
+      since: user ? user.createdAt : null,
+      reviews: reviews.map((x) => ({
+        id: String(x._id),
+        productId: String(x.product),
+        productName: pname.get(String(x.product)) || 'สินค้าที่ถูกลบแล้ว',
+        rating: x.rating,
+        comment: x.comment,
+        photos: photoOut(x.photos),
+        createdAt: x.createdAt,
+      })),
+    };
+    if (isAdmin) {
+      const orders = await Order.find({ user: r.user, status: { $ne: 'cancelled' } }).sort({ createdAt: -1 }).limit(20);
+      out.admin = {
+        fullName: user ? user.name : r.userName,
+        nickname: user ? user.nickname || '' : '',
+        email: user ? user.email : '',
+        orders: orders.map((o) => ({
+          id: String(o._id),
+          orderNo: o.orderNo,
+          status: o.status,
+          total: o.total,
+          createdAt: o.createdAt,
+          items: o.items.map((i) => ({ name: i.name, qty: i.qty })),
+        })),
+      };
+    }
+    res.json(out);
   } catch (e) {
     sendError(res, e);
   }
@@ -154,7 +216,7 @@ router.post('/products/:id/reviews', requireAuth, async (req, res) => {
       if (gone.length) await Image.deleteMany({ _id: { $in: gone }, kind: 'review' });
     }
     await recompute(id);
-    res.status(201).json({ review: r.toPublic(req.user._id) });
+    res.status(201).json({ review: r.toPublic(req.user._id, req.user.avatar ? '/api/images/' + req.user.avatar : req.user.picture || null) });
   } catch (e) {
     sendError(res, e);
   }

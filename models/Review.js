@@ -24,16 +24,19 @@ function maskName(name) {
   return chars.slice(0, Math.min(2, chars.length)).join('') + '***';
 }
 
-reviewSchema.methods.toPublic = function (viewerId) {
+reviewSchema.methods.toPublic = function (viewerId, avatarUrl) {
   return {
     id: this._id.toString(),
     rating: this.rating,
     comment: this.comment,
     photos: (this.photos || []).map((id) => ({ id: String(id), url: '/api/images/' + id })),
     name: maskName(this.userName),
+    avatar: avatarUrl || null,
     createdAt: this.createdAt,
     mine: !!viewerId && String(this.user) === String(viewerId),
   };
 };
 
-module.exports = mongoose.model('Review', reviewSchema);
+const Review = mongoose.model('Review', reviewSchema);
+Review.maskName = maskName;
+module.exports = Review;

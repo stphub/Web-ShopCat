@@ -7,6 +7,8 @@ import ReviewPhotoPicker from './ReviewPhotoPicker';
 import { api } from '../api';
 import { baht } from '../data/products';
 import { fmtDate } from '../data/orders';
+import Avatar from './Avatar';
+import ReviewerDialog from './ReviewerDialog';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { useProducts } from '../context/ProductsContext';
@@ -15,6 +17,7 @@ import { useProducts } from '../context/ProductsContext';
 export default function ProductDialog({ productId, onClose }) {
   const { byId, reload: reloadShop } = useProducts();
   const { user } = useAuth();
+  const [viewReviewer, setViewReviewer] = useState(null);
   const { change } = useCart();
   const product = byId[productId];
 
@@ -234,8 +237,11 @@ export default function ProductDialog({ productId, onClose }) {
                       {data.reviews.map((r) => (
                         <li key={r.id}>
                           <div className="rv-head">
+                            <button type="button" className="rv-who" onClick={() => setViewReviewer(r.id)} aria-label={'ดูโปรไฟล์ผู้รีวิว ' + r.name}>
+                              <Avatar user={{ name: r.name, picture: r.avatar }} size={28} />
+                              <span className="rv-name">{r.name}{r.mine ? ' (คุณ)' : ''}</span>
+                            </button>
                             <Stars value={r.rating} size={14} />
-                            <span className="rv-name">{r.name}{r.mine ? ' (คุณ)' : ''}</span>
                             <span className="meta">{fmtDate(r.createdAt)}</span>
                           </div>
                           {r.comment && <p className="rv-text">{r.comment}</p>}
@@ -289,6 +295,7 @@ export default function ProductDialog({ productId, onClose }) {
           </div>
         )}
       </div>
+      {viewReviewer && <ReviewerDialog reviewId={viewReviewer} onClose={() => setViewReviewer(null)} />}
     </div>
   );
 }
