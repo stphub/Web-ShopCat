@@ -448,7 +448,7 @@ a.stat:hover{border-color:var(--ink)}
 :root{--grad:linear-gradient(135deg,#f08a24,#d63f66);--glass:rgba(255,255,255,.09);--glass-line:rgba(255,255,255,.2)}
 html{scroll-behavior:smooth}
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
-.tools{scroll-margin-top:130px}
+.tools{scroll-margin-top:96px}
 
 /* ส่วนหัวเว็บ: กระจกฝ้าสีเข้ม */
 header.top{background:rgba(16,16,28,.72);backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);border-bottom:1px solid var(--glass-line);color:#fff}

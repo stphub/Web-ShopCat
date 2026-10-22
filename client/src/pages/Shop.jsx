@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import Icon from '../components/Icon';
 import { baht } from '../data/products';
@@ -37,6 +37,31 @@ export default function Shop() {
     else out.sort((a, b) => b.pop - a.pop);
     return out;
   }, [PRODUCTS, cat, age, query, sort]);
+
+  // เลือกหมวดจากเมนู หรือพิมพ์ค้นหา: เลื่อนลงมาที่รายการสินค้าให้ทันที (ไม่เลื่อนถ้าอยู่แถวนั้นอยู่แล้ว)
+  const goToProducts = () => {
+    const el = document.getElementById('products');
+    if (!el) return;
+    const bar = document.querySelector('header.top');
+    const offset = (bar ? bar.getBoundingClientRect().height : 0) + 12;
+    const top = el.getBoundingClientRect().top - offset;
+    if (Math.abs(top) < 24) return;
+    window.scrollTo({ top: Math.max(0, window.scrollY + top), behavior: 'smooth' });
+  };
+  const firstCat = useRef(true);
+  useEffect(() => {
+    if (firstCat.current) {
+      firstCat.current = false;
+      if (cat === 'all') return undefined; // เข้าหน้าแรกปกติ ไม่ต้องเลื่อน
+    }
+    const t = setTimeout(goToProducts, 60); // รอให้รายการสินค้าอัปเดตก่อน
+    return () => clearTimeout(t);
+  }, [cat]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => {
+    if (!query.trim()) return undefined;
+    const t = setTimeout(goToProducts, 350); // รอให้พิมพ์จบคำก่อนค่อยเลื่อน
+    return () => clearTimeout(t);
+  }, [query]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const ageHint = AGES.find((a) => a[0] === age)[2];
 
