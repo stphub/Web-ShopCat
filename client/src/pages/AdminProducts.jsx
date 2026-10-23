@@ -6,7 +6,7 @@ import { AGES, CATEGORIES, KINDS, baht } from '../data/products';
 import { ACCEPT_ATTR, prepareImage } from '../utils/image';
 
 const EMPTY = {
-  name: '', cat: 'food', age: 'all', price: '', was: '', size: '',
+  name: '', nameEn: '', cat: 'food', age: 'all', price: '', was: '', size: '', sizeEn: '',
   kind: 'bag', color: '#f08a24', stock: '', pop: 5, active: true,
   photos: [], // รูปทั้งหมดเรียงตามลำดับ (รูปแรก = รูปหลัก) แต่ละรูปคือ { id, url }
 };
@@ -84,7 +84,7 @@ export default function AdminProducts() {
     discardAll();
     setSavedIds(p.photos.map((ph) => ph.id));
     setEditingId(p.id);
-    setForm({ ...EMPTY, ...p, was: p.was || '', photos: p.photos });
+    setForm({ ...EMPTY, ...p, was: p.was || '', nameEn: p.nameEn || '', sizeEn: p.sizeEn || '', photos: p.photos });
     setError(null);
     setNotice('');
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -156,6 +156,9 @@ export default function AdminProducts() {
             <label htmlFor="a-name" className="span2">ชื่อสินค้า
               <input id="a-name" value={form.name} onChange={set('name')} maxLength={120} aria-invalid={invalid('name')} required />
             </label>
+            <label htmlFor="a-name-en" className="span2">ชื่อสินค้า (อังกฤษ) <span className="hint">ไม่บังคับ ถ้าว่างจะแสดงชื่อไทยแม้ลูกค้าเลือกภาษาอังกฤษ</span>
+              <input id="a-name-en" lang="en" value={form.nameEn} onChange={set('nameEn')} maxLength={120} aria-invalid={invalid('nameEn')} placeholder="e.g. Tuna Adult Cat Food" />
+            </label>
             <label htmlFor="a-cat">หมวด
               <select id="a-cat" value={form.cat} onChange={set('cat')}>
                 {CATEGORIES.filter((c) => c[0] !== 'all').map(([id, l]) => <option key={id} value={id}>{l}</option>)}
@@ -174,6 +177,9 @@ export default function AdminProducts() {
             </label>
             <label htmlFor="a-size">ขนาด/น้ำหนัก
               <input id="a-size" value={form.size} onChange={set('size')} maxLength={60} placeholder="เช่น 1.5 กก." />
+            </label>
+            <label htmlFor="a-size-en">ขนาด/น้ำหนัก (อังกฤษ)
+              <input id="a-size-en" lang="en" value={form.sizeEn} onChange={set('sizeEn')} maxLength={60} aria-invalid={invalid('sizeEn')} placeholder="e.g. 1.5 kg" />
             </label>
             <label htmlFor="a-stock">จำนวนสต็อก
               <input id="a-stock" type="number" inputMode="numeric" min="0" step="1" value={form.stock} onChange={set('stock')} aria-invalid={invalid('stock')} />

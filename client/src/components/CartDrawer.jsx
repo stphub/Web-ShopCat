@@ -9,11 +9,13 @@ import PromptPayBox from './PromptPayBox';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
 import { useProducts } from '../context/ProductsContext';
+import { useI18n } from '../i18n';
 
 export default function CartDrawer({ open, onClose }) {
   const cart = useCart();
   const { user } = useAuth();
   const { reload, payMinutes } = useProducts();
+  const { t, pname } = useI18n();
 
   const [step, setStep] = useState('cart'); // cart | checkout | done
   const [addresses, setAddresses] = useState(null); // null = กำลังโหลด
@@ -108,15 +110,15 @@ export default function CartDrawer({ open, onClose }) {
     }
   };
 
-  const title = step === 'done' ? 'สั่งซื้อเรียบร้อย' : step === 'checkout' ? 'ข้อมูลจัดส่ง' : 'ตะกร้าของคุณ';
+  const title = step === 'done' ? t('สั่งซื้อเรียบร้อย') : step === 'checkout' ? t('ข้อมูลจัดส่ง') : t('ตะกร้าของคุณ');
 
   return (
     <>
       <div className={'scrim' + (open ? ' open' : '')} onClick={onClose} />
-      <aside className={'drawer' + (open ? ' open' : '')} aria-hidden={!open} aria-label="ตะกร้าสินค้า">
+      <aside className={'drawer' + (open ? ' open' : '')} aria-hidden={!open} aria-label={t('ตะกร้าสินค้า')}>
         <div className="dhead">
           <h2>{title}</h2>
-          <button className="x" onClick={onClose} aria-label="ปิดตะกร้า">&#10005;</button>
+          <button className="x" onClick={onClose} aria-label={t('ปิดตะกร้า')}>&#10005;</button>
         </div>
 
         {step === 'done' && order && (
@@ -124,8 +126,8 @@ export default function CartDrawer({ open, onClose }) {
             <div className="dbody">
               <div className="done">
                 <span className="donecheck" aria-hidden="true">&#10003;</span>
-                <h3>ขอบคุณที่อุดหนุน</h3>
-                <p className="doneinfo num">ออเดอร์ <b>{order.orderNo}</b> · {ORDER_STATUS[order.status]}</p>
+                <h3>{t('ขอบคุณที่อุดหนุน')}</h3>
+                <p className="doneinfo num">{t('ออเดอร์')} <b>{order.orderNo}</b> · {t(ORDER_STATUS[order.status])}</p>
                 {order.status === 'pending' && (
                   <PromptPayBox
                     order={order}
@@ -135,18 +137,18 @@ export default function CartDrawer({ open, onClose }) {
                 )}
                 {order.status === 'cancelled' && (
                   <p className="err" role="alert">
-                    ออเดอร์นี้ถูกยกเลิกอัตโนมัติ เพราะไม่ได้ชำระเงินภายใน {payMinutes} นาที สินค้าถูกคืนเข้าสต็อกแล้ว หากยังต้องการสั่ง กรุณาสั่งซื้อใหม่
+                    {t('ออเดอร์นี้ถูกยกเลิกอัตโนมัติ เพราะไม่ได้ชำระเงินภายใน {n} นาที สินค้าถูกคืนเข้าสต็อกแล้ว หากยังต้องการสั่ง กรุณาสั่งซื้อใหม่', { n: payMinutes })}
                   </p>
                 )}
                 <p className="note">
-                  ชำระเงินแล้วแนบสลิปได้ที่นี่ หรือแนบทีหลังที่{' '}
-                  <Link to="/account/orders" onClick={onClose}>คำสั่งซื้อของฉัน</Link>{' '}
-                  เมื่อร้านตรวจสลิปและยืนยันแล้ว สถานะจะเปลี่ยนเป็น "ชำระเงินแล้ว"
+                  {t('ชำระเงินแล้วแนบสลิปได้ที่นี่ หรือแนบทีหลังที่')}{' '}
+                  <Link to="/account/orders" onClick={onClose}>{t('คำสั่งซื้อของฉัน')}</Link>{' '}
+                  {t('เมื่อร้านตรวจสลิปและยืนยันแล้ว สถานะจะเปลี่ยนเป็น "ชำระเงินแล้ว"')}
                 </p>
               </div>
             </div>
             <div className="dfoot">
-              <button className="go" onClick={() => { setStep('cart'); onClose(); }}>กลับไปเลือกสินค้า</button>
+              <button className="go" onClick={() => { setStep('cart'); onClose(); }}>{t('กลับไปเลือกสินค้า')}</button>
             </div>
           </>
         )}
@@ -156,13 +158,13 @@ export default function CartDrawer({ open, onClose }) {
             <div className="dbody">
               {addresses && addresses.length > 0 && (
                 <fieldset className="addrpick">
-                  <legend>เลือกที่อยู่จัดส่ง</legend>
+                  <legend>{t('เลือกที่อยู่จัดส่ง')}</legend>
                   {addresses.map((a) => (
                     <label key={a.id} className={'addropt' + (sel === a.id ? ' on' : '')}>
                       <input type="radio" name="addr" checked={sel === a.id} onChange={() => setSel(a.id)} />
                       <span>
                         <b>{a.label || a.name}</b>
-                        {a.isDefault && <em className="tag">ที่อยู่หลัก</em>}
+                        {a.isDefault && <em className="tag">{t('ที่อยู่หลัก')}</em>}
                         <span className="meta block">{a.name} · {a.tel}</span>
                         <span className="meta block">{a.line}</span>
                       </span>
@@ -170,33 +172,33 @@ export default function CartDrawer({ open, onClose }) {
                   ))}
                   <label className={'addropt' + (sel === 'new' ? ' on' : '')}>
                     <input type="radio" name="addr" checked={sel === 'new'} onChange={() => setSel('new')} />
-                    <span><b>ใช้ที่อยู่ใหม่</b></span>
+                    <span><b>{t('ใช้ที่อยู่ใหม่')}</b></span>
                   </label>
                 </fieldset>
               )}
-              {addresses === null && <p className="note">กำลังโหลดที่อยู่ที่บันทึกไว้...</p>}
+              {addresses === null && <p className="note">{t('กำลังโหลดที่อยู่ที่บันทึกไว้...')}</p>}
 
               {sel === 'new' && addresses !== null && (
                 <>
                   <AddressFields values={form} onChange={setForm} idPrefix="f" errorField={err && err.field} />
                   <label className="check" htmlFor="f-save">
                     <input id="f-save" type="checkbox" checked={save} onChange={(e) => setSave(e.target.checked)} />
-                    บันทึกที่อยู่นี้ไว้ใช้ครั้งหน้า
+                    {t('บันทึกที่อยู่นี้ไว้ใช้ครั้งหน้า')}
                   </label>
                 </>
               )}
 
               {err && <div className="err" role="alert">{err.message}</div>}
               <p className="note">
-                หลังกดยืนยันคำสั่งซื้อ ต้องโอนเงินและแนบสลิปภายใน {payMinutes} นาที ไม่เช่นนั้นระบบจะยกเลิกออเดอร์ให้อัตโนมัติ
+                {t('หลังกดยืนยันคำสั่งซื้อ ต้องโอนเงินและแนบสลิปภายใน {n} นาที ไม่เช่นนั้นระบบจะยกเลิกออเดอร์ให้อัตโนมัติ', { n: payMinutes })}
               </p>
               <p className="note">
-                ยอดที่ต้องชำระ {baht(cart.total)} (สินค้า {baht(cart.subtotal)} ค่าส่ง {cart.shipping ? baht(cart.shipping) : 'ฟรี'})
+                {t('ยอดที่ต้องชำระ {total} (สินค้า {sub} ค่าส่ง {ship})', { total: baht(cart.total), sub: baht(cart.subtotal), ship: cart.shipping ? baht(cart.shipping) : t('ฟรี') })}
               </p>
             </div>
             <div className="dfoot">
-              <button className="go" type="submit" disabled={busy || addresses === null}>{busy ? 'กำลังสั่งซื้อ...' : 'ยืนยันคำสั่งซื้อ'}</button>
-              <button className="rm" type="button" onClick={() => setStep('cart')}>กลับไปแก้ตะกร้า</button>
+              <button className="go" type="submit" disabled={busy || addresses === null}>{busy ? t('กำลังสั่งซื้อ...') : t('ยืนยันคำสั่งซื้อ')}</button>
+              <button className="rm" type="button" onClick={() => setStep('cart')}>{t('กลับไปแก้ตะกร้า')}</button>
             </div>
           </form>
         )}
@@ -206,32 +208,32 @@ export default function CartDrawer({ open, onClose }) {
             <div className="dbody">
               {notice && <div className="err" role="alert">{notice}</div>}
               {cart.lines.length === 0 ? (
-                <p className="empty" style={{ padding: '40px 0' }}>ตะกร้ายังว่าง เลือกของให้เจ้านายได้เลย</p>
+                <p className="empty" style={{ padding: '40px 0' }}>{t('ตะกร้ายังว่าง เลือกของให้เจ้านายได้เลย')}</p>
               ) : (
                 <>
                   <div className="ship">
-                    {left > 0 ? <>ซื้ออีก <b className="num">{baht(left)}</b> ส่งฟรี</> : 'ส่งฟรีแล้ว'}
+                    {left > 0 ? <>{t('ซื้ออีก')} <b className="num">{baht(left)}</b> {t('ส่งฟรี')}</> : t('ส่งฟรีแล้ว')}
                     <div className="meter"><i style={{ width: pct + '%' }} /></div>
                   </div>
                   {cart.lines.map(({ product: p, qty, over }) => (
                     <div className="line" key={p.id}>
                       <Art product={p} />
                       <div>
-                        <h3>{p.name}</h3>
+                        <h3>{pname(p)}</h3>
                         <div className="qty">
-                          <button onClick={() => cart.change(p.id, -1)} aria-label="ลดจำนวน">&minus;</button>
+                          <button onClick={() => cart.change(p.id, -1)} aria-label={t('ลดจำนวน')}>&minus;</button>
                           <span className="num">{qty}</span>
-                          <button onClick={() => cart.change(p.id, 1)} aria-label="เพิ่มจำนวน">+</button>
+                          <button onClick={() => cart.change(p.id, 1)} aria-label={t('เพิ่มจำนวน')}>+</button>
                         </div>
                         {over && (
                           <div className="linewarn" role="alert">
-                            {p.stock > 0 ? `เหลือเพียง ${p.stock} ชิ้น กรุณาลดจำนวน` : 'สินค้าหมด กรุณาลบออกจากตะกร้า'}
+                            {p.stock > 0 ? t('เหลือเพียง {n} ชิ้น กรุณาลดจำนวน', { n: p.stock }) : t('สินค้าหมด กรุณาลบออกจากตะกร้า')}
                           </div>
                         )}
                       </div>
                       <div style={{ textAlign: 'right' }}>
                         <div className="num">{baht(p.price * qty)}</div>
-                        <button className="rm" onClick={() => cart.remove(p.id)}>ลบ</button>
+                        <button className="rm" onClick={() => cart.remove(p.id)}>{t('ลบ')}</button>
                       </div>
                     </div>
                   ))}
@@ -239,12 +241,12 @@ export default function CartDrawer({ open, onClose }) {
               )}
             </div>
             <div className="dfoot">
-              <div className="row"><span>ยอดสินค้า</span><span className="num">{baht(cart.subtotal)}</span></div>
-              <div className="row"><span>ค่าจัดส่ง</span><span className="num">{cart.subtotal ? (cart.shipping ? baht(cart.shipping) : 'ฟรี') : '-'}</span></div>
-              <div className="row total"><span>รวม</span><span className="num">{baht(cart.total)}</span></div>
+              <div className="row"><span>{t('ยอดสินค้า')}</span><span className="num">{baht(cart.subtotal)}</span></div>
+              <div className="row"><span>{t('ค่าจัดส่ง')}</span><span className="num">{cart.subtotal ? (cart.shipping ? baht(cart.shipping) : t('ฟรี')) : '-'}</span></div>
+              <div className="row total"><span>{t('รวม')}</span><span className="num">{baht(cart.total)}</span></div>
               {cart.count > 0 && !user && (
                 <div className="need-login">
-                  กรุณา <Link to="/login" onClick={onClose}>เข้าสู่ระบบ</Link> หรือ <Link to="/register" onClick={onClose}>สมัครสมาชิก</Link> ก่อนสั่งซื้อ
+                  {t('กรุณา')} <Link to="/login" onClick={onClose}>{t('เข้าสู่ระบบ').toLowerCase()}</Link> {t('หรือ')} <Link to="/register" onClick={onClose}>{t('สมัครสมาชิก').toLowerCase()}</Link> {t('ก่อนสั่งซื้อ')}
                 </div>
               )}
               <button
@@ -252,7 +254,7 @@ export default function CartDrawer({ open, onClose }) {
                 disabled={cart.count === 0 || !user || cart.hasProblem}
                 onClick={() => { setErr(null); setNotice(''); setStep('checkout'); }}
               >
-                ไปหน้าจัดส่ง
+                {t('ไปหน้าจัดส่ง')}
               </button>
             </div>
           </>

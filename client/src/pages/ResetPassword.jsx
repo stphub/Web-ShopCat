@@ -2,12 +2,14 @@ import { useState } from 'react';
 import { Link, Navigate, useSearchParams } from 'react-router-dom';
 import Logo from '../components/Logo';
 import { useAuth } from '../context/AuthContext';
+import { LangSwitch, useI18n } from '../i18n';
 
 // ตั้งรหัสผ่านใหม่จากลิงก์ในอีเมล (/reset-password?token=...)
 export default function ResetPassword() {
   const [sp] = useSearchParams();
   const token = sp.get('token') || '';
   const { user, loading, resetPassword } = useAuth();
+  const { t } = useI18n();
   const [values, setValues] = useState({ password: '', confirm: '' });
   const [error, setError] = useState(null); // { message, field, code }
   const [busy, setBusy] = useState(false);
@@ -21,7 +23,7 @@ export default function ResetPassword() {
     e.preventDefault();
     setError(null);
     if (values.password !== values.confirm) {
-      setError({ message: 'รหัสผ่านสองช่องไม่ตรงกัน', field: 'confirm' });
+      setError({ message: t('รหัสผ่านสองช่องไม่ตรงกัน'), field: 'confirm' });
       return;
     }
     setBusy(true);
@@ -39,25 +41,26 @@ export default function ResetPassword() {
   return (
     <div className="authwrap">
       <main className="box">
-        <Link className="brand" to="/"><Logo /><span>ของแมวเหมียว</span></Link>
-        <h1>ตั้งรหัสผ่านใหม่</h1>
+        <Link className="brand" to="/"><Logo /><span>{t('ของแมวเหมียว')}</span></Link>
+        <div style={{ display: "flex", justifyContent: "flex-end", margin: "-8px 0 12px" }}><LangSwitch /></div>
+        <h1>{t('ตั้งรหัสผ่านใหม่')}</h1>
 
         {dead ? (
           <>
-            <div className="err" role="alert">{error ? error.message : 'ลิงก์นี้ไม่ถูกต้อง กรุณาขอลิงก์ใหม่'}</div>
-            <p className="switch"><Link to="/forgot-password">ขอลิงก์ตั้งรหัสผ่านใหม่</Link></p>
+            <div className="err" role="alert">{error ? error.message : t('ลิงก์นี้ไม่ถูกต้อง กรุณาขอลิงก์ใหม่')}</div>
+            <p className="switch"><Link to="/forgot-password">{t('ขอลิงก์ตั้งรหัสผ่านใหม่')}</Link></p>
           </>
         ) : (
           <form onSubmit={submit} noValidate>
             {error && <div className="err" role="alert">{error.message}</div>}
-            <label htmlFor="rp-password">รหัสผ่านใหม่
+            <label htmlFor="rp-password">{t('รหัสผ่านใหม่')}
               <input id="rp-password" type="password" autoComplete="new-password" minLength={8} required value={values.password} onChange={set('password')} aria-invalid={invalid('password')} />
-              <span className="hint">อย่างน้อย 8 ตัวอักษร</span>
+              <span className="hint">{t('อย่างน้อย 8 ตัวอักษร')}</span>
             </label>
-            <label htmlFor="rp-confirm">ยืนยันรหัสผ่านใหม่
+            <label htmlFor="rp-confirm">{t('ยืนยันรหัสผ่านใหม่')}
               <input id="rp-confirm" type="password" autoComplete="new-password" required value={values.confirm} onChange={set('confirm')} aria-invalid={invalid('confirm')} />
             </label>
-            <button className="submit" type="submit" disabled={busy}>{busy ? 'กำลังบันทึก...' : 'บันทึกรหัสผ่านใหม่'}</button>
+            <button className="submit" type="submit" disabled={busy}>{busy ? t('กำลังบันทึก...') : t('บันทึกรหัสผ่านใหม่')}</button>
           </form>
         )}
       </main>

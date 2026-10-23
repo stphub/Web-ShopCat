@@ -2,11 +2,16 @@ import { useId, useState } from 'react';
 import { Stars, StarInput } from './Stars';
 import ReviewPhotoPicker from './ReviewPhotoPicker';
 import { api } from '../api';
+import { useI18n } from '../i18n';
+import { useProducts } from '../context/ProductsContext';
 
 // รีวิวสินค้าหนึ่งชิ้นจากหน้าคำสั่งซื้อ ใช้ได้เมื่อออเดอร์เป็น "ได้รับสินค้าแล้ว"
 // review = รีวิวที่เคยเขียนไว้ (หรือ null) onSaved(productId, review) แจ้งหน้าแม่หลังบันทึกสำเร็จ
 export default function OrderItemReview({ item, review, onSaved }) {
   const uid = useId();
+  const { t, pname } = useI18n();
+  const { byId } = useProducts();
+  const itemName = byId[item.product] ? pname(byId[item.product]) : item.name;
   const [open, setOpen] = useState(false);
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
@@ -27,7 +32,7 @@ export default function OrderItemReview({ item, review, onSaved }) {
     e.preventDefault();
     setErr(null);
     if (!rating) {
-      setErr('กรุณาให้คะแนน 1-5 ดาว');
+      setErr(t('กรุณาให้คะแนน 1-5 ดาว'));
       return;
     }
     setBusy(true);
@@ -48,11 +53,11 @@ export default function OrderItemReview({ item, review, onSaved }) {
         {review ? (
           <div className="rv-done">
             <Stars value={review.rating} size={14} />
-            <span className="meta">รีวิวแล้ว{review.photos && review.photos.length ? ' · แนบรูป ' + review.photos.length : ''}</span>
-            <button type="button" className="rm" onClick={start} aria-label={`แก้ไขรีวิว ${item.name}`}>แก้ไขรีวิว</button>
+            <span className="meta">{t('รีวิวแล้ว')}{review.photos && review.photos.length ? ' · ' + t('แนบรูป {n}', { n: review.photos.length }) : ''}</span>
+            <button type="button" className="rm" onClick={start} aria-label={t('แก้ไขรีวิว {name}', { name: itemName })}>{t('แก้ไขรีวิว')}</button>
           </div>
         ) : (
-          <button type="button" className="ghost" onClick={start} aria-label={`เขียนรีวิว ${item.name}`}>เขียนรีวิว</button>
+          <button type="button" className="ghost" onClick={start} aria-label={t('เขียนรีวิว {name}', { name: itemName })}>{t('เขียนรีวิว')}</button>
         )}
       </div>
     );
@@ -62,14 +67,14 @@ export default function OrderItemReview({ item, review, onSaved }) {
     <form className="itemreview rv-inline" onSubmit={save} noValidate>
       <StarInput value={rating} onChange={setRating} disabled={busy} />
       <label htmlFor={uid + '-c'} className="rv-label">
-        ความคิดเห็น (ไม่บังคับ)
+        {t('ความคิดเห็น (ไม่บังคับ)')}
         <textarea id={uid + '-c'} rows={3} maxLength={500} value={comment} onChange={(e) => setComment(e.target.value)} />
       </label>
       <ReviewPhotoPicker photos={photos} onChange={setPhotos} disabled={busy} />
       {err && <div className="err" role="alert">{err}</div>}
       <div className="actions">
-        <button className="submit" type="submit" disabled={busy}>{review ? 'บันทึกการแก้ไข' : 'ส่งรีวิว'}</button>
-        <button type="button" className="ghost" onClick={() => setOpen(false)} disabled={busy}>ยกเลิก</button>
+        <button className="submit" type="submit" disabled={busy}>{review ? t('บันทึกการแก้ไข') : t('ส่งรีวิว')}</button>
+        <button type="button" className="ghost" onClick={() => setOpen(false)} disabled={busy}>{t('ยกเลิก')}</button>
       </div>
     </form>
   );

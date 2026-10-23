@@ -6,7 +6,7 @@ import WishButton from './WishButton';
 import ReviewPhotoPicker from './ReviewPhotoPicker';
 import { api } from '../api';
 import { baht } from '../data/products';
-import { fmtDate } from '../data/orders';
+import { useI18n } from '../i18n';
 import Avatar from './Avatar';
 import ReviewerDialog from './ReviewerDialog';
 import { useAuth } from '../context/AuthContext';
@@ -17,6 +17,14 @@ import { useProducts } from '../context/ProductsContext';
 export default function ProductDialog({ productId, onClose }) {
   const { byId, reload: reloadShop } = useProducts();
   const { user } = useAuth();
+  const { t, locale, pname, psize } = useI18n();
+  const fmtDate = (v) => {
+    try {
+      return new Date(v).toLocaleDateString(locale, { dateStyle: 'medium', timeZone: 'Asia/Bangkok' });
+    } catch {
+      return '';
+    }
+  };
   const [viewReviewer, setViewReviewer] = useState(null);
   const { change } = useCart();
   const product = byId[productId];
@@ -99,13 +107,13 @@ export default function ProductDialog({ productId, onClose }) {
     setErr(null);
     setNotice('');
     if (!rating) {
-      setErr('กรุณาให้คะแนน 1-5 ดาว');
+      setErr(t('กรุณาให้คะแนน 1-5 ดาว'));
       return;
     }
     setBusy(true);
     try {
       await api.reviews.save(productId, { rating, comment, photos: photos.map((p) => p.id) });
-      setNotice('บันทึกรีวิวแล้ว ขอบคุณที่ให้คะแนน');
+      setNotice(t('บันทึกรีวิวแล้ว ขอบคุณที่ให้คะแนน'));
       await load();
       reloadShop();
     } catch (ex) {
@@ -116,7 +124,7 @@ export default function ProductDialog({ productId, onClose }) {
   };
 
   const removeReview = async (r) => {
-    if (!window.confirm(r.mine ? 'ลบรีวิวของคุณใช่ไหม' : 'ลบรีวิวนี้ใช่ไหม')) return;
+    if (!window.confirm(r.mine ? t('ลบรีวิวของคุณใช่ไหม') : t('ลบรีวิวนี้ใช่ไหม'))) return;
     setErr(null);
     setNotice('');
     try {
@@ -126,7 +134,7 @@ export default function ProductDialog({ productId, onClose }) {
         setComment('');
         setPhotos([]);
       }
-      setNotice('ลบรีวิวแล้ว');
+      setNotice(t('ลบรีวิวแล้ว'));
       await load();
       reloadShop();
     } catch (ex) {
@@ -142,12 +150,12 @@ export default function ProductDialog({ productId, onClose }) {
   return (
     <div className="modalscrim" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
       <div className="dialog" role="dialog" aria-modal="true" aria-labelledby="pd-title" ref={dialogRef} onKeyDown={trap}>
-        <button ref={closeRef} className="x dclose" onClick={onClose} aria-label="ปิดหน้าต่าง">&#10005;</button>
+        <button ref={closeRef} className="x dclose" onClick={onClose} aria-label={t('ปิดหน้าต่าง')}>&#10005;</button>
 
         {!product ? (
           <div className="dpad">
-            <h2 id="pd-title">ไม่พบสินค้านี้</h2>
-            <p className="note">สินค้านี้อาจถูกนำออกจากหน้าร้านแล้ว</p>
+            <h2 id="pd-title">{t('ไม่พบสินค้านี้')}</h2>
+            <p className="note">{t('สินค้านี้อาจถูกนำออกจากหน้าร้านแล้ว')}</p>
           </div>
         ) : (
           <div className="dpad">
@@ -156,12 +164,12 @@ export default function ProductDialog({ productId, onClose }) {
                 <Art product={shots.length ? { ...product, imageUrl: shots[Math.min(shot, shots.length - 1)].url } : product} />
                 {shots.length > 1 && (
                   <>
-                    <button type="button" className="gnav prev" onClick={() => setShot((i) => (i - 1 + shots.length) % shots.length)} aria-label="รูปก่อนหน้า">&#8249;</button>
-                    <button type="button" className="gnav next" onClick={() => setShot((i) => (i + 1) % shots.length)} aria-label="รูปถัดไป">&#8250;</button>
-                    <ul className="gthumbs" aria-label="รูปสินค้า">
+                    <button type="button" className="gnav prev" onClick={() => setShot((i) => (i - 1 + shots.length) % shots.length)} aria-label={t('รูปก่อนหน้า')}>&#8249;</button>
+                    <button type="button" className="gnav next" onClick={() => setShot((i) => (i + 1) % shots.length)} aria-label={t('รูปถัดไป')}>&#8250;</button>
+                    <ul className="gthumbs" aria-label={t('รูปสินค้า')}>
                       {shots.map((ph, i) => (
                         <li key={ph.id}>
-                          <button type="button" aria-pressed={i === shot} aria-label={'ดูรูปที่ ' + (i + 1) + ' จาก ' + shots.length} onClick={() => setShot(i)}>
+                          <button type="button" aria-pressed={i === shot} aria-label={t('ดูรูปที่ {i} จาก {n}', { i: i + 1, n: shots.length })} onClick={() => setShot(i)}>
                             <img src={ph.url} alt="" loading="lazy" />
                           </button>
                         </li>
@@ -171,17 +179,17 @@ export default function ProductDialog({ productId, onClose }) {
                 )}
               </div>
               <div className="pd-info">
-                <h2 id="pd-title">{product.name} <WishButton product={product} className="inline" /></h2>
-                <div className="meta">{product.size}</div>
+                <h2 id="pd-title">{pname(product)} <WishButton product={product} className="inline" /></h2>
+                <div className="meta">{psize(product)}</div>
                 <div className="pd-rate">
                   {product.ratingCount > 0 ? (
                     <>
                       <Stars value={product.ratingAvg} />
                       <span className="num">{product.ratingAvg.toFixed(1)}</span>
-                      <span className="meta">({product.ratingCount} รีวิว)</span>
+                      <span className="meta">({t('{n} รีวิว', { n: product.ratingCount })})</span>
                     </>
                   ) : (
-                    <span className="meta">ยังไม่มีรีวิว</span>
+                    <span className="meta">{t('ยังไม่มีรีวิว')}</span>
                   )}
                 </div>
                 <div className="price num">
@@ -197,17 +205,17 @@ export default function ProductDialog({ productId, onClose }) {
                     setTimeout(() => setAdded(false), 900);
                   }}
                 >
-                  {out ? 'สินค้าหมด' : added ? 'เพิ่มแล้ว' : 'ใส่ตะกร้า'}
+                  {out ? t('สินค้าหมด') : added ? t('เพิ่มแล้ว') : t('ใส่ตะกร้า')}
                 </button>
-                {!out && product.stock <= 5 && <div className="meta">เหลือ {product.stock} ชิ้น</div>}
+                {!out && product.stock <= 5 && <div className="meta">{t('เหลือ {n} ชิ้น', { n: product.stock })}</div>}
               </div>
             </div>
 
             <section className="reviews" aria-labelledby="rv-title">
-              <h3 id="rv-title">รีวิวจากลูกค้า</h3>
+              <h3 id="rv-title">{t('รีวิวจากลูกค้า')}</h3>
 
-              {loadErr && <div className="err" role="alert">โหลดรีวิวไม่สำเร็จ: {loadErr}</div>}
-              {!data && !loadErr && <p className="note">กำลังโหลดรีวิว...</p>}
+              {loadErr && <div className="err" role="alert">{t('โหลดรีวิวไม่สำเร็จ:')} {loadErr}</div>}
+              {!data && !loadErr && <p className="note">{t('กำลังโหลดรีวิว...')}</p>}
 
               {data && (
                 <>
@@ -216,12 +224,12 @@ export default function ProductDialog({ productId, onClose }) {
                       <div className="rv-big">
                         <span className="num">{sum.avg.toFixed(1)}</span>
                         <Stars value={sum.avg} size={18} />
-                        <span className="meta">{sum.count} รีวิว</span>
+                        <span className="meta">{t('{n} รีวิว', { n: sum.count })}</span>
                       </div>
-                      <ul className="rv-dist" aria-label="จำนวนรีวิวแยกตามดาว">
+                      <ul className="rv-dist" aria-label={t('จำนวนรีวิวแยกตามดาว')}>
                         {[5, 4, 3, 2, 1].map((n) => (
                           <li key={n}>
-                            <span className="num">{n} ดาว</span>
+                            <span className="num">{t('{n} ดาว', { n })}</span>
                             <span className="track"><i style={{ width: (sum.breakdown[n] / sum.count) * 100 + '%' }} /></span>
                             <span className="num meta">{sum.breakdown[n]}</span>
                           </li>
@@ -231,33 +239,33 @@ export default function ProductDialog({ productId, onClose }) {
                   )}
 
                   {data.reviews.length === 0 ? (
-                    <p className="note">ยังไม่มีรีวิวสำหรับสินค้านี้</p>
+                    <p className="note">{t('ยังไม่มีรีวิวสำหรับสินค้านี้')}</p>
                   ) : (
                     <ul className="rv-list">
                       {data.reviews.map((r) => (
                         <li key={r.id}>
                           <div className="rv-head">
-                            <button type="button" className="rv-who" onClick={() => setViewReviewer(r.id)} aria-label={'ดูโปรไฟล์ผู้รีวิว ' + r.name}>
+                            <button type="button" className="rv-who" onClick={() => setViewReviewer(r.id)} aria-label={t('ดูโปรไฟล์ผู้รีวิว {name}', { name: r.name })}>
                               <Avatar user={{ name: r.name, picture: r.avatar }} size={28} />
-                              <span className="rv-name">{r.name}{r.mine ? ' (คุณ)' : ''}</span>
+                              <span className="rv-name">{r.name}{r.mine ? ' ' + t('(คุณ)') : ''}</span>
                             </button>
                             <Stars value={r.rating} size={14} />
                             <span className="meta">{fmtDate(r.createdAt)}</span>
                           </div>
                           {r.comment && <p className="rv-text">{r.comment}</p>}
                           {r.photos && r.photos.length > 0 && (
-                            <ul className="rvgallery" aria-label="รูปจากผู้รีวิว">
+                            <ul className="rvgallery" aria-label={t('รูปจากผู้รีวิว')}>
                               {r.photos.map((ph) => (
                                 <li key={ph.id}>
-                                  <a href={ph.url} target="_blank" rel="noopener noreferrer" aria-label="ดูรูปรีวิวขนาดใหญ่">
-                                    <img src={ph.url} alt="รูปจากรีวิว" loading="lazy" />
+                                  <a href={ph.url} target="_blank" rel="noopener noreferrer" aria-label={t('ดูรูปรีวิวขนาดใหญ่')}>
+                                    <img src={ph.url} alt={t('รูปจากรีวิว')} loading="lazy" />
                                   </a>
                                 </li>
                               ))}
                             </ul>
                           )}
                           {(r.mine || isAdmin) && (
-                            <button className="rm" onClick={() => removeReview(r)}>{r.mine ? 'ลบรีวิวของฉัน' : 'ลบรีวิว (แอดมิน)'}</button>
+                            <button className="rm" onClick={() => removeReview(r)}>{r.mine ? t('ลบรีวิวของฉัน') : t('ลบรีวิว (แอดมิน)')}</button>
                           )}
                         </li>
                       ))}
@@ -267,23 +275,23 @@ export default function ProductDialog({ productId, onClose }) {
                   <div className="rv-form">
                     {!data.loggedIn ? (
                       <p className="need-login">
-                        <Link to="/login" onClick={onClose}>เข้าสู่ระบบ</Link> เพื่อรีวิวสินค้าที่คุณเคยสั่งซื้อ
+                        <Link to="/login" onClick={onClose}>{t('เข้าสู่ระบบ')}</Link> {t('เพื่อรีวิวสินค้าที่คุณเคยสั่งซื้อ')}
                       </p>
                     ) : !data.canReview ? (
                       <p className="note">
-                        รีวิวได้หลังจากที่คุณกดยืนยันรับสินค้านี้แล้ว ไปที่ <Link to="/account/orders" onClick={onClose}>คำสั่งซื้อของฉัน</Link> เลือกคำสั่งซื้อที่ร้านจัดส่งแล้ว แล้วกด "ยืนยันรับสินค้า"
+                        {t('รีวิวได้หลังจากที่คุณกดยืนยันรับสินค้านี้แล้ว ไปที่')} <Link to="/account/orders" onClick={onClose}>{t('คำสั่งซื้อของฉัน')}</Link> {t('เลือกคำสั่งซื้อที่ร้านจัดส่งแล้ว แล้วกด "ยืนยันรับสินค้า"')}
                       </p>
                     ) : (
                       <form onSubmit={submit} noValidate>
-                        <h4>{data.myReview ? 'แก้ไขรีวิวของคุณ' : 'เขียนรีวิว'}</h4>
+                        <h4>{data.myReview ? t('แก้ไขรีวิวของคุณ') : t('เขียนรีวิว')}</h4>
                         <StarInput value={rating} onChange={setRating} disabled={busy} />
                         <label htmlFor="rv-comment" className="rv-label">
-                          ความคิดเห็น (ไม่บังคับ)
+                          {t('ความคิดเห็น (ไม่บังคับ)')}
                           <textarea id="rv-comment" rows={3} maxLength={500} value={comment} onChange={(e) => setComment(e.target.value)} />
                         </label>
                         <ReviewPhotoPicker photos={photos} onChange={setPhotos} disabled={busy} />
                         {err && <div className="err" role="alert">{err}</div>}
-                        <button className="submit" type="submit" disabled={busy}>{data.myReview ? 'บันทึกการแก้ไข' : 'ส่งรีวิว'}</button>
+                        <button className="submit" type="submit" disabled={busy}>{data.myReview ? t('บันทึกการแก้ไข') : t('ส่งรีวิว')}</button>
                       </form>
                     )}
                     {data.canReview === false && err && <div className="err" role="alert">{err}</div>}

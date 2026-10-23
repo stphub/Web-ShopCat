@@ -7,9 +7,11 @@ import Avatar from './Avatar';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { useWishlist } from '../context/WishlistContext';
+import { useI18n, LangSwitch } from '../i18n';
 
 // เมนูบัญชีสำหรับจอเล็ก: รวมลิงก์บัญชีไว้ในปุ่มเดียว (จอใหญ่ใช้แถบปุ่มปกติ)
 function AccountMenu({ user, loading, logout, wishCount }) {
+  const { t } = useI18n();
   const [open, setOpen] = useState(false);
   const box = useRef(null);
   useEffect(() => {
@@ -29,24 +31,24 @@ function AccountMenu({ user, loading, logout, wishCount }) {
   const close = () => setOpen(false);
   return (
     <div className={'acctm ' + (user ? 'member' : 'guest')} ref={box}>
-      <button type="button" className="acctbtn" aria-haspopup="menu" aria-expanded={open} aria-label={user ? 'เมนูบัญชีของ ' + (user.nickname || user.name) : 'เข้าสู่ระบบ / สมัครสมาชิก'} onClick={() => setOpen((v) => !v)}>
+      <button type="button" className="acctbtn" aria-haspopup="menu" aria-expanded={open} aria-label={user ? t('เมนูบัญชีของ {name}', { name: user.nickname || user.name }) : t('เข้าสู่ระบบ / สมัครสมาชิก')} onClick={() => setOpen((v) => !v)}>
         {user ? <Avatar user={user} size={28} /> : <Icon name="user" />}
       </button>
       {open && (
         <div className="acctpanel" role="menu">
           {user ? (
             <>
-              <div className="acctwho">สวัสดี {user.nickname || user.name}</div>
-              <Link role="menuitem" to="/account" onClick={close}>บัญชีของฉัน</Link>
-              <Link role="menuitem" to="/account/orders" onClick={close}>คำสั่งซื้อของฉัน</Link>
-              <Link role="menuitem" to="/wishlist" onClick={close}>รายการโปรด{wishCount > 0 ? ` (${wishCount})` : ''}</Link>
-              {user.role === 'admin' && <Link role="menuitem" to="/admin" onClick={close}>จัดการร้าน</Link>}
-              <button type="button" role="menuitem" onClick={() => { close(); logout(); }}>ออกจากระบบ</button>
+              <div className="acctwho">{t('สวัสดี {name}', { name: user.nickname || user.name })}</div>
+              <Link role="menuitem" to="/account" onClick={close}>{t('บัญชีของฉัน')}</Link>
+              <Link role="menuitem" to="/account/orders" onClick={close}>{t('คำสั่งซื้อของฉัน')}</Link>
+              <Link role="menuitem" to="/wishlist" onClick={close}>{t('รายการโปรด')}{wishCount > 0 ? ` (${wishCount})` : ''}</Link>
+              {user.role === 'admin' && <Link role="menuitem" to="/admin" onClick={close}>{t('จัดการร้าน')}</Link>}
+              <button type="button" role="menuitem" onClick={() => { close(); logout(); }}>{t('ออกจากระบบ')}</button>
             </>
           ) : (
             <>
-              <Link role="menuitem" to="/login" onClick={close}>เข้าสู่ระบบ</Link>
-              <Link role="menuitem" to="/register" onClick={close}>สมัครสมาชิก</Link>
+              <Link role="menuitem" to="/login" onClick={close}>{t('เข้าสู่ระบบ')}</Link>
+              <Link role="menuitem" to="/register" onClick={close}>{t('สมัครสมาชิก')}</Link>
             </>
           )}
         </div>
@@ -56,6 +58,7 @@ function AccountMenu({ user, loading, logout, wishCount }) {
 }
 
 export default function Header({ query, onQuery, onOpenCart }) {
+  const { t } = useI18n();
   const { user, loading, logout } = useAuth();
   const { count } = useCart();
   const wish = useWishlist();
@@ -65,7 +68,7 @@ export default function Header({ query, onQuery, onOpenCart }) {
       <div className="bar">
         <Link className="logo" to="/" style={{ textDecoration: 'none', color: 'inherit' }}>
           <Logo />
-          <span>ของแมวเหมียว</span>
+          <span>{t('ของแมวเหมียว')}</span>
         </Link>
 
         <SiteNav />
@@ -75,24 +78,26 @@ export default function Header({ query, onQuery, onOpenCart }) {
             type="search"
             value={query}
             onChange={(e) => onQuery(e.target.value)}
-            placeholder="ค้นหาสินค้า"
-            aria-label="ค้นหาสินค้า"
+            placeholder={t('ค้นหาสินค้า')}
+            aria-label={t('ค้นหาสินค้า')}
           />
         </div>
 
         <div className="acct" aria-live="polite">
           {loading || user ? null : (
             <>
-              <Link to="/login">เข้าสู่ระบบ</Link>
-              <Link className="primary" to="/register">สมัครสมาชิก</Link>
+              <Link to="/login">{t('เข้าสู่ระบบ')}</Link>
+              <Link className="primary" to="/register">{t('สมัครสมาชิก')}</Link>
             </>
           )}
         </div>
 
         <AccountMenu user={user} loading={loading} logout={logout} wishCount={wish.count} />
 
-        <button className="cartbtn" onClick={onOpenCart} aria-label="เปิดตะกร้า">
-          ตะกร้า <b className="num">{count}</b>
+        <LangSwitch className="hdrlang" />
+
+        <button className="cartbtn" onClick={onOpenCart} aria-label={t('เปิดตะกร้า')}>
+          {t('ตะกร้า')} <b className="num">{count}</b>
         </button>
       </div>
     </header>

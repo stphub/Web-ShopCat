@@ -18,11 +18,13 @@ function parseProduct(body) {
   const b = body || {};
   const data = {
     name: String(b.name || '').trim(),
+    nameEn: String(b.nameEn || '').trim(),
     cat: String(b.cat || ''),
     age: String(b.age || 'all'),
     price: b.price === '' || b.price == null ? NaN : Number(b.price),
     was: b.was === '' || b.was == null ? 0 : Number(b.was),
     size: String(b.size || '').trim(),
+    sizeEn: String(b.sizeEn || '').trim(),
     kind: String(b.kind || ''),
     color: String(b.color || ''),
     stock: b.stock === '' || b.stock == null ? NaN : Number(b.stock),
@@ -33,12 +35,14 @@ function parseProduct(body) {
   };
   let error = null;
   if (!data.name || data.name.length > 120) error = ['name', 'กรุณากรอกชื่อสินค้า (ไม่เกิน 120 ตัวอักษร)'];
+  else if (data.nameEn.length > 120) error = ['nameEn', 'ชื่อภาษาอังกฤษยาวเกิน 120 ตัวอักษร'];
   else if (!CATEGORIES.includes(data.cat)) error = ['cat', 'เลือกหมวดสินค้า'];
   else if (!AGES.includes(data.age)) error = ['age', 'เลือกวัยแมว'];
   else if (!isInt(data.price, 0, 1000000)) error = ['price', 'ราคาต้องเป็นจำนวนเต็มบาท 0 ถึง 1,000,000'];
   else if (!isInt(data.was, 0, 1000000)) error = ['was', 'ราคาก่อนลดต้องเป็นจำนวนเต็มบาท'];
   else if (data.was > 0 && data.was <= data.price) error = ['was', 'ราคาก่อนลดต้องมากกว่าราคาขาย (หรือเว้นว่างถ้าไม่ลดราคา)'];
   else if (data.size.length > 60) error = ['size', 'ขนาด/น้ำหนักยาวเกิน 60 ตัวอักษร'];
+  else if (data.sizeEn.length > 60) error = ['sizeEn', 'ขนาด/น้ำหนักภาษาอังกฤษยาวเกิน 60 ตัวอักษร'];
   else if (!KINDS.includes(data.kind)) error = ['kind', 'เลือกรูปแบบภาพประกอบ'];
   else if (!/^#[0-9a-fA-F]{6}$/.test(data.color)) error = ['color', 'สีต้องเป็นรหัส เช่น #f08a24'];
   else if (!isInt(data.stock, 0, 100000)) error = ['stock', 'จำนวนสต็อกต้องเป็นจำนวนเต็ม 0 ขึ้นไป'];

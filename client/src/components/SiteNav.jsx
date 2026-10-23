@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { CATEGORIES } from '../data/products';
 import { HELP_PAGES } from '../data/helpPages';
+import { useI18n } from '../i18n';
 
 // เมนูนำทางด้านบน: รายการที่มีลูกศร ⌄ กดแล้วมีเมนูย่อยลงมา และเมนูของหน้าที่เปิดอยู่จะมีเส้นใต้สี
 const MENU = [
@@ -37,6 +38,7 @@ function Chevron({ open }) {
 const pathOf = (to) => to.split('?')[0];
 
 function Dropdown({ item, pathname, here }) {
+  const { t } = useI18n();
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
   const active = item.items.some((i) => pathOf(i.to) === pathname);
@@ -58,7 +60,7 @@ function Dropdown({ item, pathname, here }) {
   return (
     <div className="navdrop" ref={ref} onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)}>
       <button type="button" className={'navitem' + (active ? ' on' : '')} aria-expanded={open} onClick={() => setOpen((o) => !o)}>
-        {item.label}
+        {t(item.label)}
         <Chevron open={open} />
       </button>
       {open && (
@@ -66,8 +68,8 @@ function Dropdown({ item, pathname, here }) {
           {item.items.map((i) => (
             <li key={i.to}>
               <Link to={i.to} aria-current={i.to === here ? 'page' : undefined}>
-                <b>{i.label}</b>
-                {i.desc && <span>{i.desc}</span>}
+                <b>{t(i.label)}</b>
+                {i.desc && <span>{t(i.desc)}</span>}
               </Link>
             </li>
           ))}
@@ -78,10 +80,11 @@ function Dropdown({ item, pathname, here }) {
 }
 
 export default function SiteNav() {
+  const { t } = useI18n();
   const { pathname, search } = useLocation();
   const here = pathname + search;
   return (
-    <nav className="sitenav" aria-label="เมนูหลัก">
+    <nav className="sitenav" aria-label={t('เมนูหลัก')}>
       {MENU.map((m) => (
         <Dropdown key={m.label} item={m} pathname={pathname} here={here} />
       ))}

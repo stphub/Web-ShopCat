@@ -4,9 +4,11 @@ import { Stars } from './Stars';
 import WishButton from './WishButton';
 import { baht } from '../data/products';
 import { useCart } from '../context/CartContext';
+import { useI18n } from '../i18n';
 
 export default function ProductCard({ product, onOpen }) {
   const { change } = useCart();
+  const { t, pname, psize } = useI18n();
   const [added, setAdded] = useState(false);
   const timer = useRef(null);
   useEffect(() => () => clearTimeout(timer.current), []);
@@ -25,19 +27,19 @@ export default function ProductCard({ product, onOpen }) {
     <article className="card">
       {/* คลิกที่ภาพเพื่อเปิดรายละเอียดได้ด้วยเมาส์/นิ้ว (ผู้ใช้คีย์บอร์ดใช้ปุ่มชื่อสินค้าด้านล่าง) */}
       <div className="cardart" onClick={() => onOpen(product.id)}>
-        <Art product={product}>{off > 0 && <span className="badge">ลด {off}%</span>}</Art>
+        <Art product={product}>{off > 0 && <span className="badge">{t('ลด {n}%', { n: off })}</span>}</Art>
         <WishButton product={product} className="oncard" />
-        {product.photos && product.photos.length > 1 && <span className="photocount" aria-label={product.photos.length + ' รูป'}>{product.photos.length} รูป</span>}
+        {product.photos && product.photos.length > 1 && <span className="photocount" aria-label={t('{n} รูป', { n: product.photos.length })}>{t('{n} รูป', { n: product.photos.length })}</span>}
       </div>
       <div className="info">
         <h3>
-          <button className="namebtn" onClick={() => onOpen(product.id)} aria-label={`ดูรายละเอียดและรีวิว ${product.name}`}>
-            {product.name}
+          <button className="namebtn" onClick={() => onOpen(product.id)} aria-label={t('ดูรายละเอียดและรีวิว {name}', { name: pname(product) })}>
+            {pname(product)}
           </button>
         </h3>
         <div className="meta">
-          {product.size}
-          {!out && product.stock <= 5 ? ` · เหลือ ${product.stock} ชิ้น` : ''}
+          {psize(product)}
+          {!out && product.stock <= 5 ? ' · ' + t('เหลือ {n} ชิ้น', { n: product.stock }) : ''}
         </div>
         <div className="rate">
           {product.ratingCount > 0 ? (
@@ -46,7 +48,7 @@ export default function ProductCard({ product, onOpen }) {
               <span className="num meta">{product.ratingAvg.toFixed(1)} ({product.ratingCount})</span>
             </>
           ) : (
-            <span className="meta">ยังไม่มีรีวิว</span>
+            <span className="meta">{t('ยังไม่มีรีวิว')}</span>
           )}
         </div>
         <div className="buy">
@@ -54,8 +56,8 @@ export default function ProductCard({ product, onOpen }) {
             {product.was > 0 && <s>{baht(product.was)}</s>}
             {baht(product.price)}
           </div>
-          <button className="add" onClick={add} disabled={out} aria-label={`หยิบ ${product.name} ใส่ตะกร้า`}>
-            {out ? 'สินค้าหมด' : added ? 'เพิ่มแล้ว' : 'ใส่ตะกร้า'}
+          <button className="add" onClick={add} disabled={out} aria-label={t('หยิบ {name} ใส่ตะกร้า', { name: pname(product) })}>
+            {out ? t('สินค้าหมด') : added ? t('เพิ่มแล้ว') : t('ใส่ตะกร้า')}
           </button>
         </div>
       </div>

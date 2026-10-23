@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { api } from '../api';
+import { useI18n } from '../i18n';
 
 const SCRIPT = 'https://accounts.google.com/gsi/client';
 
@@ -24,6 +25,7 @@ export default function GoogleButton({ onCredential }) {
   const cb = useRef(onCredential);
   cb.current = onCredential;
   const [enabled, setEnabled] = useState(false);
+  const { t, lang } = useI18n();
 
   useEffect(() => {
     let cancelled = false;
@@ -55,16 +57,16 @@ export default function GoogleButton({ onCredential }) {
       size: 'large',
       text: 'continue_with',
       shape: 'pill',
-      locale: 'th',
+      locale: lang,
       width,
     });
-  }, [enabled]);
+  }, [enabled, lang]);
 
   if (!enabled) return null;
   return (
     <div className="gwrap">
       <div className="gslot" ref={slot} />
-      <div className="or">หรือใช้อีเมล</div>
+      <div className="or">{t('หรือใช้อีเมล')}</div>
     </div>
   );
 }

@@ -1,11 +1,13 @@
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useWishlist } from '../context/WishlistContext';
+import { useI18n } from '../i18n';
 
 // ปุ่มหัวใจเก็บเป็นรายการโปรด ถ้ายังไม่ล็อกอินจะพาไปหน้าเข้าสู่ระบบ
 export default function WishButton({ product, className = '' }) {
   const { user } = useAuth();
   const { has, toggle } = useWishlist();
+  const { t, pname } = useI18n();
   const nav = useNavigate();
   const on = !!user && has(product.id);
 
@@ -20,8 +22,8 @@ export default function WishButton({ product, className = '' }) {
       type="button"
       className={'wish ' + className + (on ? ' on' : '')}
       aria-pressed={on}
-      aria-label={(on ? 'เอาออกจากรายการโปรด ' : 'เก็บเป็นรายการโปรด ') + product.name}
-      title={user ? (on ? 'เอาออกจากรายการโปรด' : 'เก็บเป็นรายการโปรด') : 'เข้าสู่ระบบเพื่อเก็บรายการโปรด'}
+      aria-label={(on ? t('เอาออกจากรายการโปรด') : t('เก็บเป็นรายการโปรด')) + ' ' + pname(product)}
+      title={user ? (on ? t('เอาออกจากรายการโปรด') : t('เก็บเป็นรายการโปรด')) : t('เข้าสู่ระบบเพื่อเก็บรายการโปรด')}
       onClick={click}
     >
       <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true">

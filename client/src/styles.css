@@ -800,6 +800,15 @@ html:root header.top .acctbtn{width:36px;height:36px;background:transparent;bord
   html:root header.top .acct{display:none}
   html:root header.top .acctm{order:2;display:block}
   html:root header.top .cartbtn{order:3}
-  html:root header.top .search{order:4;flex:1 1 100%;margin-left:0}
+  html:root header.top .search{order:4;flex:1 1 calc(100% - 100px);min-width:0;margin-left:0}
+  html:root header.top .hdrlang{order:4;flex:none}
   html:root header.top .sitenav{order:5;flex:1 1 100%;margin-inline:-10px}
 }
+
+/* ปุ่มสลับภาษา TH / EN */
+.langsw{display:inline-flex;align-items:center;gap:4px;font-size:13px}
+.langsw button{border:0;background:none;padding:4px 2px;color:inherit;opacity:.5;cursor:pointer;font:inherit;font-weight:500}
+.langsw button[aria-pressed="true"]{opacity:1;font-weight:700;text-decoration:underline;text-underline-offset:4px}
+.langsw span{opacity:.35}
+
+html:root header.top .hdrlang{flex:none;font-size:13px}

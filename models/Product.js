@@ -8,11 +8,13 @@ const KINDS = ['bag', 'can', 'pouch', 'mouse', 'wand', 'sand', 'box', 'post', 'b
 const productSchema = new mongoose.Schema(
   {
     name: { type: String, required: true, trim: true, maxlength: 120 },
+    nameEn: { type: String, trim: true, maxlength: 120, default: '' }, // ชื่อภาษาอังกฤษ (ไม่บังคับ ถ้าว่างใช้ชื่อไทยแทน)
     cat: { type: String, required: true, enum: CATEGORIES },
     age: { type: String, required: true, enum: AGES, default: 'all' },
     price: { type: Number, required: true, min: 0, max: 1000000 }, // บาท
     was: { type: Number, min: 0, max: 1000000, default: 0 }, // ราคาก่อนลด (0 = ไม่ลด)
     size: { type: String, trim: true, maxlength: 60, default: '' },
+    sizeEn: { type: String, trim: true, maxlength: 60, default: '' }, // ขนาด/น้ำหนักภาษาอังกฤษ (ไม่บังคับ)
     kind: { type: String, required: true, enum: KINDS }, // รูปแบบภาพประกอบ
     color: { type: String, required: true, match: /^#[0-9a-fA-F]{6}$/ },
     stock: { type: Number, required: true, min: 0, max: 100000, default: 0 },
@@ -31,11 +33,13 @@ productSchema.methods.toPublic = function () {
   return {
     id: this._id.toString(),
     name: this.name,
+    nameEn: this.nameEn || '',
     cat: this.cat,
     age: this.age,
     price: this.price,
     was: this.was || 0,
     size: this.size,
+    sizeEn: this.sizeEn || '',
     kind: this.kind,
     color: this.color,
     stock: this.stock,

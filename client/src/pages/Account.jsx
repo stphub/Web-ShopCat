@@ -15,6 +15,7 @@ import { ORDER_STATUS, fmtDate, fmtDateTime } from '../data/orders';
 import { useAuth } from '../context/AuthContext';
 import { useProducts } from '../context/ProductsContext';
 import { useCart } from '../context/CartContext';
+import { useI18n } from '../i18n';
 
 const EMPTY = { label: '', name: '', tel: '', line: '', isDefault: false };
 
@@ -22,9 +23,11 @@ const EMPTY = { label: '', name: '', tel: '', line: '', isDefault: false };
 // view='orders' (/account/orders): คำสั่งซื้อของฉัน ชำระเงิน รับสินค้า รีวิว คืนสินค้า
 export default function Account({ view = 'profile' }) {
   const isOrders = view === 'orders';
+  const { t, pname } = useI18n();
   const { user, loading } = useAuth();
   const { reload: reloadShop, returnDays, payMinutes, byId } = useProducts();
   const { change } = useCart();
+  const itemName = (i) => (byId[i.product] ? pname(byId[i.product]) : i.name);
   const [buyMsg, setBuyMsg] = useState(null); // { id, text, added }
 
   const [addresses, setAddresses] = useState(null);
@@ -107,7 +110,7 @@ export default function Account({ view = 'profile' }) {
     }
   }, [user, isOrders, loadAddresses, loadOrders, loadReviews, loadReturns]);
 
-  if (loading) return <div className="authwrap"><p className="sub">กำลังโหลด...</p></div>;
+  if (loading) return <div className="authwrap"><p className="sub">{t('กำลังโหลด...')}</p></div>;
   if (!user) return <Navigate to="/login" replace />;
 
   const reset = () => {
@@ -131,7 +134,7 @@ export default function Account({ view = 'profile' }) {
     try {
       if (editingId) await api.addresses.update(editingId, form);
       else await api.addresses.create(form);
-      setNotice(editingId ? 'บันทึกการแก้ไขที่อยู่แล้ว' : 'เพิ่มที่อยู่แล้ว');
+      setNotice(editingId ? t('บันทึกการแก้ไขที่อยู่แล้ว') : t('เพิ่มที่อยู่แล้ว'));
       reset();
       await loadAddresses();
     } catch (ex) {
@@ -152,7 +155,7 @@ export default function Account({ view = 'profile' }) {
   };
 
   const removeAddress = async (a) => {
-    if (!window.confirm('ลบที่อยู่ "' + (a.label || a.name) + '" ใช่ไหม')) return;
+    if (!window.confirm(t('ลบที่อยู่ "{name}" ใช่ไหม', { name: a.label || a.name }))) return;
     setNotice('');
     try {
       await api.addresses.remove(a.id);
@@ -169,24 +172,24 @@ export default function Account({ view = 'profile' }) {
     const notes = [];
     o.items.forEach((i) => {
       const p = byId[i.product];
-      if (!p) return notes.push(i.name + ' (เลิกขายแล้ว)');
-      if (p.stock <= 0) return notes.push(i.name + ' (หมด)');
+      if (!p) return notes.push(i.name + ' ' + t('(เลิกขายแล้ว)'));
+      if (p.stock <= 0) return notes.push(pname(p) + ' ' + t('(หมด)'));
       const want = Math.min(i.qty, p.stock);
       change(i.product, want);
       added += 1;
-      if (want < i.qty) notes.push(i.name + ' (เหลือ ' + p.stock + ' ชิ้น ใส่ให้เท่าที่มี)');
+      if (want < i.qty) notes.push(pname(p) + ' ' + t('(เหลือ {n} ชิ้น ใส่ให้เท่าที่มี)', { n: p.stock }));
     });
     setBuyMsg({
       id: o.id,
       added,
       text: added
-        ? 'ใส่ตะกร้าแล้ว ' + added + ' รายการ' + (notes.length ? ' · ข้าม/ปรับ: ' + notes.join(', ') : '')
-        : 'สินค้าในออเดอร์นี้ไม่มีให้สั่งแล้ว: ' + notes.join(', '),
+        ? t('ใส่ตะกร้าแล้ว {n} รายการ', { n: added }) + (notes.length ? ' · ' + t('ข้าม/ปรับ') + ': ' + notes.join(', ') : '')
+        : t('สินค้าในออเดอร์นี้ไม่มีให้สั่งแล้ว') + ': ' + notes.join(', '),
     });
   };
 
   const cancelOrder = async (o) => {
-    if (!window.confirm('ยกเลิกออเดอร์ ' + o.orderNo + ' ใช่ไหม')) return;
+    if (!window.confirm(t('ยกเลิกออเดอร์ {no} ใช่ไหม', { no: o.orderNo }))) return;
     try {
       await api.orders.cancel(o.id);
       await loadOrders();
@@ -197,7 +200,7 @@ export default function Account({ view = 'profile' }) {
   };
 
   const receiveOrder = async (o) => {
-    if (!window.confirm('ยืนยันว่าคุณได้รับสินค้าของออเดอร์ ' + o.orderNo + ' แล้วใช่ไหม')) return;
+    if (!window.confirm(t('ยืนยันว่าคุณได้รับสินค้าของออเดอร์ {no} แล้วใช่ไหม', { no: o.orderNo }))) return;
     setRecvBusy(o.id);
     setOrdErr(null);
     try {
@@ -212,7 +215,7 @@ export default function Account({ view = 'profile' }) {
   };
 
   const withdrawReturn = async (r) => {
-    if (!window.confirm('ยกเลิกคำขอคืน/เปลี่ยนสินค้านี้ใช่ไหม')) return;
+    if (!window.confirm(t('ยกเลิกคำขอคืน/เปลี่ยนสินค้านี้ใช่ไหม'))) return;
     setOrdErr(null);
     try {
       await api.returns.withdraw(r.id);
@@ -224,7 +227,7 @@ export default function Account({ view = 'profile' }) {
 
   const onReturnSent = () => {
     setReturnFor(null);
-    setRetMsg('ส่งคำขอแล้ว ร้านจะตรวจสอบและแจ้งผลที่หน้านี้');
+    setRetMsg(t('ส่งคำขอแล้ว ร้านจะตรวจสอบและแจ้งผลที่หน้านี้'));
     loadReturns();
   };
 
@@ -235,21 +238,21 @@ export default function Account({ view = 'profile' }) {
 
   return (
     <div className="admin">
-      <PageBar title={isOrders ? 'คำสั่งซื้อของฉัน' : 'บัญชีของฉัน'} />
-      <nav className="admintabs wrap" aria-label="เมนูบัญชี">
-        <NavLink to="/account" end>โปรไฟล์</NavLink>
-        <NavLink to="/account/orders">คำสั่งซื้อของฉัน</NavLink>
+      <PageBar title={isOrders ? t('คำสั่งซื้อของฉัน') : t('บัญชีของฉัน')} />
+      <nav className="admintabs wrap" aria-label={t('เมนูบัญชี')}>
+        <NavLink to="/account" end>{t('โปรไฟล์')}</NavLink>
+        <NavLink to="/account/orders">{t('คำสั่งซื้อของฉัน')}</NavLink>
       </nav>
       <main className="wrap adminmain">
         {!isOrders && <ProfilePanel />}
 
         {!isOrders && (
         <section className="panel" aria-labelledby="addr-title">
-          <h2 id="addr-title">ที่อยู่จัดส่งที่บันทึกไว้</h2>
+          <h2 id="addr-title">{t('ที่อยู่จัดส่งที่บันทึกไว้')}</h2>
           {addrErr && <div className="err" role="alert">{addrErr}</div>}
-          {addresses === null && !addrErr && <p className="note">กำลังโหลด...</p>}
+          {addresses === null && !addrErr && <p className="note">{t('กำลังโหลด...')}</p>}
           {addresses && addresses.length === 0 && (
-            <p className="note">ยังไม่มีที่อยู่ที่บันทึกไว้ เพิ่มจากฟอร์มด้านล่าง หรือติ๊ก "บันทึกที่อยู่นี้" ตอนสั่งซื้อ</p>
+            <p className="note">{t('ยังไม่มีที่อยู่ที่บันทึกไว้ เพิ่มจากฟอร์มด้านล่าง หรือติ๊ก "บันทึกที่อยู่นี้" ตอนสั่งซื้อ')}</p>
           )}
           {addresses && addresses.length > 0 && (
             <ul className="addrlist">
@@ -257,14 +260,14 @@ export default function Account({ view = 'profile' }) {
                 <li key={a.id} className="addrcard">
                   <div>
                     <b>{a.label || a.name}</b>
-                    {a.isDefault && <em className="tag">ที่อยู่หลัก</em>}
+                    {a.isDefault && <em className="tag">{t('ที่อยู่หลัก')}</em>}
                     <div className="meta">{a.name} · {a.tel}</div>
                     <div className="meta">{a.line}</div>
                   </div>
                   <div className="rowact">
-                    {!a.isDefault && <button className="ghost" onClick={() => makeDefault(a)}>ตั้งเป็นที่อยู่หลัก</button>}
-                    <button className="ghost" onClick={() => startEdit(a)}>แก้ไข</button>
-                    <button className="ghost danger" onClick={() => removeAddress(a)}>ลบ</button>
+                    {!a.isDefault && <button className="ghost" onClick={() => makeDefault(a)}>{t('ตั้งเป็นที่อยู่หลัก')}</button>}
+                    <button className="ghost" onClick={() => startEdit(a)}>{t('แก้ไข')}</button>
+                    <button className="ghost danger" onClick={() => removeAddress(a)}>{t('ลบ')}</button>
                   </div>
                 </li>
               ))}
@@ -272,18 +275,18 @@ export default function Account({ view = 'profile' }) {
           )}
 
           <form className="addrform" onSubmit={submit} noValidate>
-            <h3>{editingId ? 'แก้ไขที่อยู่' : 'เพิ่มที่อยู่ใหม่'}</h3>
+            <h3>{editingId ? t('แก้ไขที่อยู่') : t('เพิ่มที่อยู่ใหม่')}</h3>
             <AddressFields values={form} onChange={setForm} idPrefix="a" showLabel errorField={formErr && formErr.field} />
             {!editingId && addresses && addresses.length > 0 && (
               <label className="check" htmlFor="a-default">
                 <input id="a-default" type="checkbox" checked={form.isDefault} onChange={(e) => setForm({ ...form, isDefault: e.target.checked })} />
-                ตั้งเป็นที่อยู่หลัก
+                {t('ตั้งเป็นที่อยู่หลัก')}
               </label>
             )}
             {formErr && <div className="err" role="alert">{formErr.message}</div>}
             <div className="actions">
-              <button className="submit" type="submit" disabled={busy}>{editingId ? 'บันทึกการแก้ไข' : 'เพิ่มที่อยู่'}</button>
-              {editingId && <button type="button" className="ghost" onClick={reset}>ยกเลิกการแก้ไข</button>}
+              <button className="submit" type="submit" disabled={busy}>{editingId ? t('บันทึกการแก้ไข') : t('เพิ่มที่อยู่')}</button>
+              {editingId && <button type="button" className="ghost" onClick={reset}>{t('ยกเลิกการแก้ไข')}</button>}
             </div>
             {notice && <p className="okmsg" role="status">{notice}</p>}
           </form>
@@ -297,12 +300,12 @@ export default function Account({ view = 'profile' }) {
 
         {isOrders && (
         <section className="panel" aria-labelledby="ord-title">
-          <h2 id="ord-title">คำสั่งซื้อของฉัน</h2>
+          <h2 id="ord-title">{t('คำสั่งซื้อของฉัน')}</h2>
           {ordErr && <div className="err" role="alert">{ordErr}</div>}
           {retMsg && <p className="okmsg" role="status">{retMsg}</p>}
-          {orders === null && !ordErr && <p className="note">กำลังโหลด...</p>}
+          {orders === null && !ordErr && <p className="note">{t('กำลังโหลด...')}</p>}
           {orders && orders.length === 0 && (
-            <p className="note">ยังไม่มีคำสั่งซื้อ <Link to="/">ไปเลือกสินค้า</Link></p>
+            <p className="note">{t('ยังไม่มีคำสั่งซื้อ')} <Link to="/">{t('ไปเลือกสินค้า')}</Link></p>
           )}
           {orders && orders.length > 0 && (
             <ul className="ordlist">
@@ -310,13 +313,13 @@ export default function Account({ view = 'profile' }) {
                 <li key={o.id} className="ord">
                   <div className="ord-head">
                     <b className="num">{o.orderNo}</b>
-                    <span className={'status s-' + o.status}>{ORDER_STATUS[o.status]}</span>
+                    <span className={'status s-' + o.status}>{t(ORDER_STATUS[o.status])}</span>
                     <span className="meta">{fmtDateTime(o.createdAt)}</span>
                   </div>
                   <ul className="ord-items">
                     {o.items.map((i) => (
                       <li key={i.product} className={o.status === 'received' ? 'hasrv' : undefined}>
-                        <span>{i.name} × {i.qty}</span>
+                        <span>{itemName(i)} × {i.qty}</span>
                         <span className="num">{baht(i.price * i.qty)}</span>
                         {o.status === 'received' && (
                           <OrderItemReview item={i} review={myReviews[i.product] || null} onSaved={onReviewSaved} />
@@ -325,23 +328,23 @@ export default function Account({ view = 'profile' }) {
                     ))}
                   </ul>
                   <div className="ord-foot">
-                    <span className="num">ค่าส่ง {o.shipping ? baht(o.shipping) : 'ฟรี'} · รวม <b>{baht(o.total)}</b></span>
-                    {o.tracking && <span className="num">เลขพัสดุ: <b>{o.tracking}</b></span>}
-                    {o.status === 'pending' && <button className="ghost danger" onClick={() => cancelOrder(o)}>ยกเลิกออเดอร์</button>}
-                    <button className="ghost buyagain" onClick={() => buyAgain(o)}>สั่งซ้ำ</button>
+                    <span className="num">{t('ค่าส่ง')} {o.shipping ? baht(o.shipping) : t('ฟรี')} · {t('รวม')} <b>{baht(o.total)}</b></span>
+                    {o.tracking && <span className="num">{t('เลขพัสดุ')}: <b>{o.tracking}</b></span>}
+                    {o.status === 'pending' && <button className="ghost danger" onClick={() => cancelOrder(o)}>{t('ยกเลิกออเดอร์')}</button>}
+                    <button className="ghost buyagain" onClick={() => buyAgain(o)}>{t('สั่งซ้ำ')}</button>
                     {o.status === 'shipped' && (
-                      <button className="submit" disabled={recvBusy === o.id} onClick={() => receiveOrder(o)}>ยืนยันรับสินค้า</button>
+                      <button className="submit" disabled={recvBusy === o.id} onClick={() => receiveOrder(o)}>{t('ยืนยันรับสินค้า')}</button>
                     )}
                   </div>
                   {o.cancelledByTimeout && (
-                    <p className="note">ออเดอร์นี้ถูกยกเลิกอัตโนมัติ เพราะไม่ได้ชำระเงินภายใน {payMinutes} นาที (คืนสต็อกแล้ว) กด "สั่งซ้ำ" เพื่อสั่งใหม่ได้</p>
+                    <p className="note">{t('ออเดอร์นี้ถูกยกเลิกอัตโนมัติ เพราะไม่ได้ชำระเงินภายใน {n} นาที (คืนสต็อกแล้ว) กด "สั่งซ้ำ" เพื่อสั่งใหม่ได้', { n: payMinutes })}</p>
                   )}
                   {buyMsg && buyMsg.id === o.id && (
                     <p className={buyMsg.added ? 'okmsg' : 'err'} role="status">
-                      {buyMsg.text} {buyMsg.added > 0 && <Link to="/?cart=1">เปิดตะกร้า</Link>}
+                      {buyMsg.text} {buyMsg.added > 0 && <Link to="/?cart=1">{t('เปิดตะกร้า')}</Link>}
                     </p>
                   )}
-                  <div className="meta">ส่งไปที่ {o.address.name} · {o.address.tel} · {o.address.line}</div>
+                  <div className="meta">{t('ส่งไปที่')} {o.address.name} · {o.address.tel} · {o.address.line}</div>
                   {o.status === 'pending' && (
                     <PromptPayBox
                       order={o}
@@ -351,12 +354,12 @@ export default function Account({ view = 'profile' }) {
                   )}
                   {o.status === 'shipped' && (
                     <p className="note">
-                      เมื่อได้รับสินค้าแล้ว กด "ยืนยันรับสินค้า" เพื่อปิดออเดอร์ และจะรีวิวสินค้าได้ทันที
-                      {o.autoReceiveAt ? ' (ถ้าไม่กด ระบบจะยืนยันให้อัตโนมัติหลัง ' + fmtDate(o.autoReceiveAt) + ')' : ''}
+                      {t('เมื่อได้รับสินค้าแล้ว กด "ยืนยันรับสินค้า" เพื่อปิดออเดอร์ และจะรีวิวสินค้าได้ทันที')}
+                      {o.autoReceiveAt ? ' ' + t('(ถ้าไม่กด ระบบจะยืนยันให้อัตโนมัติหลัง {date})', { date: fmtDate(o.autoReceiveAt) }) : ''}
                     </p>
                   )}
                   {o.status === 'received' && (
-                    <p className="note">{o.autoReceived ? 'ระบบยืนยันรับสินค้าให้อัตโนมัติเมื่อ ' : 'ได้รับสินค้าเมื่อ '}{fmtDateTime(o.receivedAt)} · กด "เขียนรีวิว" ใต้สินค้าแต่ละรายการได้เลย</p>
+                    <p className="note">{o.autoReceived ? t('ระบบยืนยันรับสินค้าให้อัตโนมัติเมื่อ') : t('ได้รับสินค้าเมื่อ')} {fmtDateTime(o.receivedAt)} · {t('กด "เขียนรีวิว" ใต้สินค้าแต่ละรายการได้เลย')}</p>
                   )}
                   {o.status === 'received' && (() => {
                     const mine = returns.filter((r) => r.order === o.id);
@@ -366,7 +369,7 @@ export default function Account({ view = 'profile' }) {
                       <div className="retblock">
                         {mine.map((r) => (
                           <ReturnStatus key={r.id} ret={r}>
-                            {r.status === 'pending' && <button className="ghost danger" onClick={() => withdrawReturn(r)}>ยกเลิกคำขอ</button>}
+                            {r.status === 'pending' && <button className="ghost danger" onClick={() => withdrawReturn(r)}>{t('ยกเลิกคำขอ')}</button>}
                           </ReturnStatus>
                         ))}
                         {returnFor === o.id ? (
@@ -374,13 +377,13 @@ export default function Account({ view = 'profile' }) {
                         ) : (
                           !open && inWindow && (
                             <div className="rowact">
-                              <button className="ghost" onClick={() => { setReturnFor(o.id); setRetMsg(''); }}>แจ้งคืน/เปลี่ยนสินค้า</button>
-                              <span className="meta">แจ้งได้ถึง {fmtDate(o.returnUntil)} (ภายใน {returnDays} วันหลังยืนยันรับสินค้า)</span>
+                              <button className="ghost" onClick={() => { setReturnFor(o.id); setRetMsg(''); }}>{t('แจ้งคืน/เปลี่ยนสินค้า')}</button>
+                              <span className="meta">{t('แจ้งได้ถึง {date} (ภายใน {n} วันหลังยืนยันรับสินค้า)', { date: fmtDate(o.returnUntil), n: returnDays })}</span>
                             </div>
                           )
                         )}
                         {!open && !inWindow && mine.length === 0 && (
-                          <p className="meta">เกินกำหนดแจ้งคืนผ่านเว็บแล้ว หากมีปัญหากับสินค้า ติดต่อร้านได้ที่หน้า <Link to="/contact">ติดต่อเรา</Link></p>
+                          <p className="meta">{t('เกินกำหนดแจ้งคืนผ่านเว็บแล้ว หากมีปัญหากับสินค้า ติดต่อร้านได้ที่หน้า')} <Link to="/contact">{t('ติดต่อเรา')}</Link></p>
                         )}
                       </div>
                     );

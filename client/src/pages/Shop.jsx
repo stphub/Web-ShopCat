@@ -9,8 +9,10 @@ import CartDrawer from '../components/CartDrawer';
 import ProductDialog from '../components/ProductDialog';
 import { AGES, CATEGORIES } from '../data/products';
 import { useProducts } from '../context/ProductsContext';
+import { useI18n } from '../i18n';
 
 export default function Shop() {
+  const { t } = useI18n();
   const { products: PRODUCTS, loading, error, reload, shipping, returnDays } = useProducts();
   // หมวดสินค้าอยู่ใน URL (/?cat=food) เมนู "สินค้า" ด้านบนจึงลิงก์เข้าหมวดได้ และรีเฟรชแล้วหมวดไม่หาย
   const [sp, setSp] = useSearchParams();
@@ -29,7 +31,7 @@ export default function Shop() {
       if (cat !== 'all' && p.cat !== cat) return false;
       // กรองตามวัย: ใช้กับอาหารที่ระบุวัย ส่วนของอื่นเป็น "ทุกวัย" ให้แสดงเสมอ
       if (age !== 'all' && p.age !== 'all' && p.age !== age) return false;
-      if (q && !(p.name + ' ' + p.size).toLowerCase().includes(q)) return false;
+      if (q && !(p.name + ' ' + (p.nameEn || '') + ' ' + p.size + ' ' + (p.sizeEn || '')).toLowerCase().includes(q)) return false;
       return true;
     });
     if (sort === 'low') out.sort((a, b) => a.price - b.price);
@@ -75,61 +77,61 @@ export default function Shop() {
         <span className="blob b3" aria-hidden="true" />
         <div className="wrap hero2in">
           <div>
-            <span className="pill">ร้านของแมวออนไลน์</span>
-            <h1>ของใช้ของกินสำหรับ<em>เจ้านาย</em> ครบในที่เดียว</h1>
-            <p>อาหารเม็ด อาหารเปียก ขนม ทรายแมว ของเล่น และที่ลับเล็บ ซื้อครบ {baht(shipping.freeFrom)} ส่งฟรี</p>
+            <span className="pill">{t('ร้านของแมวออนไลน์')}</span>
+            <h1>{t('ของใช้ของกินสำหรับ')}<em>{t('เจ้านาย')}</em> {t('ครบในที่เดียว')}</h1>
+            <p>{t('อาหารเม็ด อาหารเปียก ขนม ทรายแมว ของเล่น และที่ลับเล็บ ซื้อครบ {price} ส่งฟรี', { price: baht(shipping.freeFrom) })}</p>
             <div className="ctabtns left">
-              <a className="cbtn cb-hot" href="#products">เลือกซื้อสินค้า</a>
-              <Link className="cbtn cb-glass" to="/contact">ติดต่อเรา</Link>
+              <a className="cbtn cb-hot" href="#products">{t('เลือกซื้อสินค้า')}</a>
+              <Link className="cbtn cb-glass" to="/contact">{t('ติดต่อเรา')}</Link>
             </div>
           </div>
           <div className="finder">
-            <label id="ageLabel">เจ้านายอายุเท่าไหร่</label>
+            <label id="ageLabel">{t('เจ้านายอายุเท่าไหร่')}</label>
             <div className="ages" role="group" aria-labelledby="ageLabel">
               {AGES.map(([id, label]) => (
-                <button key={id} aria-pressed={age === id} onClick={() => setAge(id)}>{label}</button>
+                <button key={id} aria-pressed={age === id} onClick={() => setAge(id)}>{t(label)}</button>
               ))}
             </div>
-            <small>{ageHint}</small>
+            <small>{t(ageHint)}</small>
           </div>
         </div>
       </section>
 
       <main className="wrap shopmain">
-        <ul className="infocards" aria-label="จุดเด่นของร้าน">
-          <li><span className="cicon"><Icon name="truck" /></span><b>ส่งฟรี</b><div>เมื่อซื้อครบ {baht(shipping.freeFrom)} (ปกติค่าส่ง {baht(shipping.fee)})</div></li>
-          <li><span className="cicon"><Icon name="star" /></span><b>รีวิวจากคนซื้อจริง</b><div>เขียนรีวิวได้หลังกดยืนยันรับสินค้าแล้วเท่านั้น</div></li>
-          <li><span className="cicon"><Icon name="undo" /></span><b>แจ้งคืนสินค้าได้</b><div>ภายใน {returnDays} วันหลังรับสินค้า พร้อมแนบรูปในเว็บ</div></li>
-          <li><span className="cicon"><Icon name="chat" /></span><b>ถามร้านได้ทุกเมื่อ</b><div><Link to="/contact">ติดต่อเรา</Link> ทางโทร LINE หรืออีเมล</div></li>
+        <ul className="infocards" aria-label={t('จุดเด่นของร้าน')}>
+          <li><span className="cicon"><Icon name="truck" /></span><b>{t('ส่งฟรี')}</b><div>{t('เมื่อซื้อครบ {price} (ปกติค่าส่ง {fee})', { price: baht(shipping.freeFrom), fee: baht(shipping.fee) })}</div></li>
+          <li><span className="cicon"><Icon name="star" /></span><b>{t('รีวิวจากคนซื้อจริง')}</b><div>{t('เขียนรีวิวได้หลังกดยืนยันรับสินค้าแล้วเท่านั้น')}</div></li>
+          <li><span className="cicon"><Icon name="undo" /></span><b>{t('แจ้งคืนสินค้าได้')}</b><div>{t('ภายใน {n} วันหลังรับสินค้า พร้อมแนบรูปในเว็บ', { n: returnDays })}</div></li>
+          <li><span className="cicon"><Icon name="chat" /></span><b>{t('ถามร้านได้ทุกเมื่อ')}</b><div><Link to="/contact">{t('ติดต่อเรา')}</Link> {t('ทางโทร LINE หรืออีเมล')}</div></li>
         </ul>
 
         <div className="tools" id="products">
-          <div className="chips" role="group" aria-label="หมวดสินค้า">
+          <div className="chips" role="group" aria-label={t('หมวดสินค้า')}>
             {CATEGORIES.map(([id, label]) => (
-              <button key={id} aria-pressed={cat === id} onClick={() => setCat(id)}>{label}</button>
+              <button key={id} aria-pressed={cat === id} onClick={() => setCat(id)}>{t(label)}</button>
             ))}
           </div>
           <label className="sort">
-            เรียง
+            {t('เรียง')}
             <select value={sort} onChange={(e) => setSort(e.target.value)}>
-              <option value="pop">แนะนำ</option>
-              <option value="low">ราคาต่ำไปสูง</option>
-              <option value="high">ราคาสูงไปต่ำ</option>
+              <option value="pop">{t('แนะนำ')}</option>
+              <option value="low">{t('ราคาต่ำไปสูง')}</option>
+              <option value="high">{t('ราคาสูงไปต่ำ')}</option>
             </select>
           </label>
         </div>
 
-        <p className="count">แสดง {list.length} จาก {PRODUCTS.length} รายการ</p>
+        <p className="count">{t('แสดง {n} จาก {total} รายการ', { n: list.length, total: PRODUCTS.length })}</p>
         <div className="grid">
           {loading ? (
-            <div className="empty">กำลังโหลดสินค้า...</div>
+            <div className="empty">{t('กำลังโหลดสินค้า...')}</div>
           ) : error ? (
             <div className="empty">
-              โหลดสินค้าไม่สำเร็จ: {error}
-              <div><button className="add" style={{ marginTop: 12 }} onClick={reload}>ลองใหม่</button></div>
+              {t('โหลดสินค้าไม่สำเร็จ:')} {error}
+              <div><button className="add" style={{ marginTop: 12 }} onClick={reload}>{t('ลองใหม่')}</button></div>
             </div>
           ) : list.length === 0 ? (
-            <div className="empty">ไม่พบสินค้าที่ตรงกับตัวกรอง ลองล้างคำค้นหรือเลือกหมวดอื่น</div>
+            <div className="empty">{t('ไม่พบสินค้าที่ตรงกับตัวกรอง ลองล้างคำค้นหรือเลือกหมวดอื่น')}</div>
           ) : (
             list.map((p) => <ProductCard key={p.id} product={p} onOpen={setOpenId} />)
           )}

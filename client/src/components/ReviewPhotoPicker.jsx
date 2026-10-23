@@ -1,11 +1,13 @@
 import { useId, useRef, useState } from 'react';
 import { api } from '../api';
+import { useI18n } from '../i18n';
 import { ACCEPT_ATTR, prepareImage } from '../utils/image';
 
 export const MAX_REVIEW_PHOTOS = 3;
 
 // เลือก/ลบรูปแนบรีวิว (ย่อรูปในเบราว์เซอร์แล้วอัปโหลดทันที ได้รหัสรูปไว้ส่งพร้อมรีวิว)
 export default function ReviewPhotoPicker({ photos, onChange, disabled }) {
+  const { t } = useI18n();
   const uid = useId();
   const input = useRef(null);
   const [busy, setBusy] = useState(false);
@@ -34,19 +36,19 @@ export default function ReviewPhotoPicker({ photos, onChange, disabled }) {
 
   return (
     <div className="rvphotos">
-      <span className="rv-label" id={uid}>รูปประกอบ (ไม่บังคับ ไม่เกิน {MAX_REVIEW_PHOTOS} รูป)</span>
+      <span className="rv-label" id={uid}>{t('รูปประกอบ (ไม่บังคับ ไม่เกิน {n} รูป)', { n: MAX_REVIEW_PHOTOS })}</span>
       <ul className="rvthumbs" aria-labelledby={uid}>
         {photos.map((p) => (
           <li key={p.id}>
-            <img src={p.url} alt="รูปที่แนบ" />
-            <button type="button" className="x" aria-label="เอารูปนี้ออก" disabled={disabled || busy} onClick={() => onChange(photos.filter((x) => x.id !== p.id))}>&#10005;</button>
+            <img src={p.url} alt={t('รูปที่แนบ')} />
+            <button type="button" className="x" aria-label={t('เอารูปนี้ออก')} disabled={disabled || busy} onClick={() => onChange(photos.filter((x) => x.id !== p.id))}>&#10005;</button>
           </li>
         ))}
         {photos.length < MAX_REVIEW_PHOTOS && (
           <li>
             <input ref={input} type="file" accept={ACCEPT_ATTR} multiple hidden onChange={pick} />
             <button type="button" className="addphoto" disabled={disabled || busy} onClick={() => input.current && input.current.click()}>
-              {busy ? 'กำลังอัปโหลด...' : '+ เพิ่มรูป'}
+              {busy ? t('กำลังอัปโหลด...') : t('+ เพิ่มรูป')}
             </button>
           </li>
         )}

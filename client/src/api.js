@@ -1,3 +1,5 @@
+import { translate } from './i18n';
+
 // เรียก API ของเซิร์ฟเวอร์ ถ้าไม่สำเร็จจะ throw Error ที่มี message ภาษาไทยและชื่อช่อง (field) ที่ผิด
 async function request(method, path, body) {
   let res;
@@ -8,7 +10,7 @@ async function request(method, path, body) {
       body: body ? JSON.stringify(body) : undefined,
     });
   } catch {
-    throw new Error('เชื่อมต่อเซิร์ฟเวอร์ไม่ได้ ลองใหม่อีกครั้ง');
+    throw new Error(translate('เชื่อมต่อเซิร์ฟเวอร์ไม่ได้ ลองใหม่อีกครั้ง'));
   }
   let data = {};
   try {
@@ -17,7 +19,7 @@ async function request(method, path, body) {
     /* ไม่มีเนื้อหา */
   }
   if (!res.ok) {
-    const err = new Error(data.error || 'เกิดข้อผิดพลาด ลองใหม่อีกครั้ง');
+    const err = new Error(translate(data.error || 'เกิดข้อผิดพลาด ลองใหม่อีกครั้ง'));
     err.field = data.field;
     err.code = data.code;
     throw err;
@@ -31,7 +33,7 @@ async function uploadImage(blob, url = '/api/admin/images') {
   try {
     res = await fetch(url, { method: 'POST', headers: { 'Content-Type': blob.type }, body: blob });
   } catch {
-    throw new Error('เชื่อมต่อเซิร์ฟเวอร์ไม่ได้ ลองใหม่อีกครั้ง');
+    throw new Error(translate('เชื่อมต่อเซิร์ฟเวอร์ไม่ได้ ลองใหม่อีกครั้ง'));
   }
   let data = {};
   try {
@@ -39,7 +41,7 @@ async function uploadImage(blob, url = '/api/admin/images') {
   } catch {
     /* ไม่มีเนื้อหา */
   }
-  if (!res.ok) throw new Error(data.error || 'อัปโหลดรูปไม่สำเร็จ');
+  if (!res.ok) throw new Error(translate(data.error || 'อัปโหลดรูปไม่สำเร็จ'));
   return data;
 }
 
