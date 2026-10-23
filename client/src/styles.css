@@ -812,3 +812,30 @@ html:root header.top .acctbtn{width:36px;height:36px;background:transparent;bord
 .langsw span{opacity:.35}
 
 html:root header.top .hdrlang{flex:none;font-size:13px}
+
+/* ===== หัวเว็บแบบไอคอน: ค้นหา | บัญชี | ตะกร้า (ตัวเลขเป็นป้ายกลมมุมขวาบน) ===== */
+html:root header.top .hdrtools{display:flex;align-items:center;gap:4px;margin-left:auto;flex:none}
+html:root header.top .hdricon{position:relative;display:inline-grid;place-items:center;width:40px;height:40px;padding:0;border:0;border-radius:50%;background:transparent;color:inherit;cursor:pointer}
+html:root header.top .hdricon:hover{background:rgba(127,127,127,.14)}
+html:root header.top .hdricon svg{width:24px;height:24px}
+html:root header.top .acctm{display:block}
+html:root header.top .acctbtn.hdricon{border:0;width:40px;height:40px}
+html:root header.top .cartbtn.hdricon{border:0;padding:0;letter-spacing:0}
+html:root header.top .cartbtn.hdricon:hover{background:rgba(127,127,127,.14);color:inherit}
+html:root header.top .cartbtn b{position:absolute;top:1px;right:-1px;min-width:18px;height:18px;padding:0 5px;border-radius:999px;background:var(--ink);color:#fff;font-size:11px;font-weight:700;line-height:18px;display:inline-block;text-align:center;box-sizing:border-box}
+html:not(.minimal) header.top .cartbtn b{background:#fff;color:#14303a}
+html:root header.top .search{flex:none;width:200px;margin:0 6px 0 0}
+html:root header.top .hdrlang{margin:0 6px 0 4px}
+.acctlang{padding:8px 12px;border-top:1px solid var(--line);margin-top:4px}
+@media (max-width:720px){
+  html:root header.top .hdrtools{display:contents}
+  html:root header.top .hdrlang{display:none}
+  html:root header.top .searchbtn{order:2}
+  html:root header.top .acctm{order:3}
+  html:root header.top .cartbtn{order:4}
+  html:root header.top .logo{order:1}
+  html:root header.top .search{order:5;flex:1 1 100%;width:auto;margin:0}
+  html:root header.top .sitenav{order:6}
+  html:root header.top .bar{gap:4px 4px}
+}
+@media (min-width:721px){ html:root header.top .acctm.guest{display:block} }

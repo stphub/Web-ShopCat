@@ -31,7 +31,7 @@ function AccountMenu({ user, loading, logout, wishCount }) {
   const close = () => setOpen(false);
   return (
     <div className={'acctm ' + (user ? 'member' : 'guest')} ref={box}>
-      <button type="button" className="acctbtn" aria-haspopup="menu" aria-expanded={open} aria-label={user ? t('เมนูบัญชีของ {name}', { name: user.nickname || user.name }) : t('เข้าสู่ระบบ / สมัครสมาชิก')} onClick={() => setOpen((v) => !v)}>
+      <button type="button" className="acctbtn hdricon" aria-haspopup="menu" aria-expanded={open} aria-label={user ? t('เมนูบัญชีของ {name}', { name: user.nickname || user.name }) : t('เข้าสู่ระบบ / สมัครสมาชิก')} onClick={() => setOpen((v) => !v)}>
         {user ? <Avatar user={user} size={28} /> : <Icon name="user" />}
       </button>
       {open && (
@@ -51,6 +51,7 @@ function AccountMenu({ user, loading, logout, wishCount }) {
               <Link role="menuitem" to="/register" onClick={close}>{t('สมัครสมาชิก')}</Link>
             </>
           )}
+          <div className="acctlang"><LangSwitch /></div>
         </div>
       )}
     </div>
@@ -62,6 +63,11 @@ export default function Header({ query, onQuery, onOpenCart }) {
   const { user, loading, logout } = useAuth();
   const { count } = useCart();
   const wish = useWishlist();
+  const [sopen, setSopen] = useState(false);
+  const sref = useRef(null);
+  useEffect(() => {
+    if (sopen && sref.current) sref.current.focus();
+  }, [sopen]);
 
   return (
     <header className="top">
@@ -73,32 +79,39 @@ export default function Header({ query, onQuery, onOpenCart }) {
 
         <SiteNav />
 
-        <div className="search">
-          <input
-            type="search"
-            value={query}
-            onChange={(e) => onQuery(e.target.value)}
-            placeholder={t('ค้นหาสินค้า')}
-            aria-label={t('ค้นหาสินค้า')}
-          />
-        </div>
-
-        <div className="acct" aria-live="polite">
-          {loading || user ? null : (
-            <>
-              <Link to="/login">{t('เข้าสู่ระบบ')}</Link>
-              <Link className="primary" to="/register">{t('สมัครสมาชิก')}</Link>
-            </>
+        <div className="hdrtools">
+          {(sopen || query) && (
+            <div className="search">
+              <input
+                ref={sref}
+                type="search"
+                value={query}
+                onChange={(e) => onQuery(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Escape') {
+                    onQuery('');
+                    setSopen(false);
+                  }
+                }}
+                onBlur={() => !query && setSopen(false)}
+                placeholder={t('ค้นหาสินค้า')}
+                aria-label={t('ค้นหาสินค้า')}
+              />
+            </div>
           )}
+          <button type="button" className="hdricon searchbtn" aria-label={t('ค้นหาสินค้า')} aria-expanded={sopen || !!query} onClick={() => setSopen((v) => !v)}>
+            <Icon name="search" />
+          </button>
+
+          <LangSwitch className="hdrlang" />
+
+          <AccountMenu user={user} loading={loading} logout={logout} wishCount={wish.count} />
+
+          <button type="button" className="hdricon cartbtn" onClick={onOpenCart} aria-label={t('เปิดตะกร้า') + ' (' + count + ')'}>
+            <Icon name="cart" />
+            <b className="num" aria-hidden="true">{count}</b>
+          </button>
         </div>
-
-        <AccountMenu user={user} loading={loading} logout={logout} wishCount={wish.count} />
-
-        <LangSwitch className="hdrlang" />
-
-        <button className="cartbtn" onClick={onOpenCart} aria-label={t('เปิดตะกร้า')}>
-          {t('ตะกร้า')} <b className="num">{count}</b>
-        </button>
       </div>
     </header>
   );
