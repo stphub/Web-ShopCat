@@ -71,6 +71,8 @@ export default {
 
   // ท้ายเว็บ
   'เกี่ยวกับร้าน': 'About the shop',
+  'ลิงก์ด่วน': 'Quick links',
+  'ติดตามและติดต่อเรา': 'Follow & contact us',
   'มินิมอล': 'Minimal',
   'ออโรร่า': 'Aurora',
   'ธีม: {name} (สลับ)': 'Theme: {name} (switch)',
