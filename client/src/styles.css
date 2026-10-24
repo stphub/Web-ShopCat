@@ -911,3 +911,13 @@ html:root footer .themebtn{border-color:rgba(255,255,255,.3);color:#fff}
 html:root footer .langsw{color:#fff}
 @media (max-width:900px){.footcols{grid-template-columns:repeat(2,minmax(0,1fr));gap:28px 20px}}
 @media (max-width:420px){.footcols{gap:24px 14px}.footcols h2{font-size:14px}}
+
+/* สีท้ายเว็บให้ตัดกับหน้า: ธีมมินิมอล (หน้าขาว) = ส้มเข้ม, ธีมออโรร่า (หน้ามืด) = ครีมอ่อน */
+html.minimal footer{--fbg:#b45309;--ftext:rgba(255,255,255,.88);--fhead:#fff;--fline:rgba(255,255,255,.28);--flink:#fff}
+html:not(.minimal) footer{--fbg:#fbeadb;--ftext:#5a4a3f;--fhead:#2b2622;--fline:rgba(43,38,34,.18);--flink:#2b2622}
+html:root footer{background:var(--fbg);color:var(--ftext)}
+html:root footer a,html.minimal footer .footnav a{color:var(--flink)}
+html:root .footcols h2{color:var(--fhead)}
+html:root .footcols{border-bottom-color:var(--fline)}
+html:root footer .themebtn{border-color:var(--fline);color:var(--flink)}
+html:root footer .langsw{color:var(--flink)}
