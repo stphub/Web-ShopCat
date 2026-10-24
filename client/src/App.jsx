@@ -6,6 +6,8 @@ import ResetPassword from './pages/ResetPassword';
 import About from './pages/About';
 import Contact from './pages/Contact';
 import HelpPage from './pages/HelpPage';
+import Articles from './pages/Articles';
+import Article from './pages/Article';
 import Wishlist from './pages/Wishlist';
 import Account from './pages/Account';
 import AdminShell from './components/AdminShell';
@@ -27,6 +29,8 @@ export default function App() {
       <Route path="/about" element={<About />} />
       <Route path="/contact" element={<Contact />} />
       <Route path="/help/:slug" element={<HelpPage />} />
+      <Route path="/articles" element={<Articles />} />
+      <Route path="/articles/:slug" element={<Article />} />
       <Route path="/wishlist" element={<Wishlist />} />
       <Route path="/account" element={<Account />} />
       <Route path="/account/orders" element={<Account view="orders" />} />

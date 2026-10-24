@@ -22,6 +22,7 @@ export default function SiteFooter() {
       <div className="wrap footrow">
         <span>© {new Date().getFullYear()} {t(SHOP.name)}</span>
         <nav aria-label={t('เกี่ยวกับร้าน')} className="footnav">
+          <Link to="/articles">{t('บทความ')}</Link>
           <Link to="/about">{t('เกี่ยวกับเรา')}</Link>
           <Link to="/contact">{t('ติดต่อเรา')}</Link>
           <Link to="/help/privacy">{t('นโยบายความเป็นส่วนตัว')}</Link>

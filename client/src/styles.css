@@ -839,3 +839,59 @@ html:root header.top .hdrlang{margin:0 6px 0 4px}
   html:root header.top .bar{gap:4px 4px}
 }
 @media (min-width:721px){ html:root header.top .acctm.guest{display:block} }
+
+/* ===== บทความดูแลแมว ===== */
+.catart{display:block;width:100%;height:auto;border-radius:16px}
+.artgrid{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:20px}
+.artcard{display:grid;gap:0;border:1px solid var(--line);border-radius:18px;overflow:hidden;background:var(--surface);color:var(--ink);text-decoration:none;height:100%;transition:transform .15s,box-shadow .15s}
+.artcard:hover{transform:translateY(-2px);box-shadow:0 10px 26px rgba(0,0,0,.1)}
+.artcard .catart{border-radius:0}
+.artcardbody{padding:16px 18px 18px;display:grid;gap:6px;align-content:start}
+.artcardbody h2{font-size:18px;line-height:1.35}
+.artcardbody p{margin:0;color:var(--muted);font-size:14px}
+.artlist{max-width:1000px}
+.arthero{background:linear-gradient(120deg,#fbeadb,#f3dccb 45%,#e9d7d0);position:relative;overflow:hidden;color:#2b2622}
+.arthero::before,.arthero::after{content:"";position:absolute;border-radius:50%;filter:blur(60px);opacity:.7;pointer-events:none}
+.arthero::before{width:320px;height:320px;background:#f6b98a;left:-80px;bottom:-120px}
+.arthero::after{width:300px;height:300px;background:#e9b7a0;right:-60px;top:-100px}
+.arthero-in{position:relative;z-index:1;display:grid;grid-template-columns:minmax(0,1.05fr) minmax(0,1fr);gap:40px;align-items:center;padding-block:44px}
+.arthero-art{box-shadow:0 14px 34px rgba(80,40,20,.18)}
+.arthero-text{display:grid;gap:12px;justify-items:start}
+.arthero-text .pill{display:inline-block;border:1px solid rgba(43,38,34,.2);background:rgba(255,255,255,.6);border-radius:999px;padding:4px 14px;font-size:13px;font-weight:600}
+.arthero-text h1{font-size:clamp(26px,4vw,40px);line-height:1.25;font-weight:600;color:#2b2622}
+.arthero-text p{margin:0;font-size:clamp(15px,2vw,17px);line-height:1.7;color:#4a413b}
+.arthero-text .meta{color:#6b5f57;font-size:13px}
+.artbody{max-width:760px;padding-top:28px;padding-bottom:32px}
+.artsec{margin-bottom:28px}
+.artsec h2{font-size:22px;margin-bottom:10px}
+.artsec p,.artsec li{line-height:1.8}
+.artsec ul,.artsec ol{padding-left:22px;display:grid;gap:8px;margin:8px 0}
+.arttable{overflow-x:auto;margin:14px 0;border:1px solid var(--line);border-radius:12px}
+.arttable table{border-collapse:collapse;width:100%;min-width:420px;font-size:14px}
+.arttable th,.arttable td{padding:10px 12px;text-align:left;vertical-align:top;border-bottom:1px solid var(--line)}
+.arttable thead th{background:var(--bg);font-weight:600;white-space:nowrap}
+.arttable tbody th{font-weight:600;white-space:nowrap}
+.arttable tr:last-child th,.arttable tr:last-child td{border-bottom:0}
+.arttip{background:#fff7ea;border:1px solid #f0d9ae;border-radius:12px;padding:12px 14px;margin:12px 0 0;color:#5a4520}
+.artdisc{font-size:13px}
+.artcta{position:relative;overflow:hidden;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:28px;align-items:center;margin:28px 0;padding:22px;border-radius:20px;background:linear-gradient(120deg,#f6dcc4,#e8cbbd 55%,#dccdc7)}
+.artcta-text{display:grid;gap:10px;justify-items:start}
+.artcta-text h2{font-size:24px;color:#2b2622}
+.artcta-text p{margin:0;color:#4a413b}
+.artcta-btn{display:inline-block;text-decoration:none;text-align:center;padding:10px 22px;width:auto}
+.artmore h2{font-size:18px;margin-bottom:8px}
+@media (max-width:720px){
+  .arthero-in{grid-template-columns:1fr;gap:20px;padding-block:24px}
+  .artcta{grid-template-columns:1fr;padding:16px}
+  .artsec h2{font-size:20px}
+}
+
+/* บทความ: ตารางกว้างเลื่อนในกล่องของมันเอง ไม่ดันหน้าให้ล้นจอ */
+.artbody,.artsec,.artbody>*{min-width:0;max-width:100%}
+@media (max-width:420px){
+  .navitem{padding-inline:7px;gap:4px}
+  html:root header.top .navitem{padding-inline:7px}
+  .sitenav{gap:0}
+}
+.footrow{flex-wrap:wrap}
+.footnav{flex-wrap:wrap;row-gap:8px}

@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { CATEGORIES } from '../data/products';
 import { HELP_PAGES } from '../data/helpPages';
+import { ARTICLES } from '../data/articles';
 import { useI18n } from '../i18n';
 
 // เมนูนำทางด้านบน: รายการที่มีลูกศร ⌄ กดแล้วมีเมนูย่อยลงมา และเมนูของหน้าที่เปิดอยู่จะมีเส้นใต้สี
@@ -80,12 +81,22 @@ function Dropdown({ item, pathname, here }) {
 }
 
 export default function SiteNav() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
+  const L = lang === 'en' ? 'en' : 'th';
+  // เมนู "บทความ" สร้างตามภาษาที่เลือก (ชื่อบทความมีทั้งไทยและอังกฤษใน data/articles.js)
+  const articles = {
+    label: 'บทความ',
+    items: [
+      { label: 'บทความทั้งหมด', desc: 'คู่มือดูแลแมวและเลือกอาหาร', to: '/articles' },
+      ...ARTICLES.map((a) => ({ label: a[L].title, desc: '', to: '/articles/' + a.slug })),
+    ],
+  };
+  const menu = [MENU[0], articles, ...MENU.slice(1)];
   const { pathname, search } = useLocation();
   const here = pathname + search;
   return (
     <nav className="sitenav" aria-label={t('เมนูหลัก')}>
-      {MENU.map((m) => (
+      {menu.map((m) => (
         <Dropdown key={m.label} item={m} pathname={pathname} here={here} />
       ))}
     </nav>

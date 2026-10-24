@@ -1,6 +1,20 @@
 // พจนานุกรมไทย → อังกฤษ (info): คีย์คือข้อความไทยเดิมทุกตัวอักษร
 // หน้าเกี่ยวกับเรา / ติดต่อเรา / ช่วยเหลือ (ข้อความที่มี {x} ใช้จับคู่ตัวเลขที่แทรกอยู่)
 export default {
+  "บทความ": "Articles",
+  "บทความทั้งหมด": "All articles",
+  "คู่มือดูแลแมวและเลือกอาหาร": "Cat care and food guides",
+  "บทความดูแลแมว": "Cat care articles",
+  "ความรู้เรื่องอาหารและการดูแลเจ้านาย เขียนให้อ่านง่าย": "Easy-to-read tips on food and caring for your boss",
+  "อ่านใช้เวลา {n} นาที": "{n} min read",
+  "อ่านต่อ": "Read more",
+  "คู่มือดูแลแมว": "Cat care guide",
+  "เคล็ดลับ": "Tip",
+  "ข้อมูลทั่วไปเพื่อประกอบการดูแลแมว ไม่ใช่คำแนะนำทางสัตวแพทย์ ถ้าแมวป่วย ตั้งท้อง หรือมีโรคประจำตัว ให้ปรึกษาสัตวแพทย์เสมอ": "General information to help you care for your cat. It is not veterinary advice. If your cat is ill, pregnant or has a health condition, always ask a vet.",
+  "เลือกอาหารเปียกให้เจ้านาย": "Pick wet food for your boss",
+  "ดูอาหารแมวทั้งหมดในร้าน กรองตามอายุแมวได้ทันที": "Browse all cat food in the shop and filter by your cat’s age",
+  "ดูอาหารแมวในร้าน": "See cat food in the shop",
+  "บทความอื่น ๆ": "More articles",
   "ของแมวเหมียว": "Meow Cat Shop",
   "ของใช้และของกินสำหรับเจ้านายสี่ขา คัดมาให้ทาสแมวเลือกง่าย": "Supplies and treats for your four-legged boss, picked to make shopping easy for cat servants",
   "ของแมวเหมียวเป็นร้านออนไลน์ที่รวมอาหาร ขนม ทรายแมว ของเล่น และของใช้สำหรับแมว ไว้ในที่เดียว": "Meow Cat Shop is an online store with cat food, treats, litter, toys and supplies all in one place.",
