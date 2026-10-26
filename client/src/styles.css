@@ -921,3 +921,6 @@ html:root .footcols h2{color:var(--fhead)}
 html:root .footcols{border-bottom-color:var(--fline)}
 html:root footer .themebtn{border-color:var(--fline);color:var(--flink)}
 html:root footer .langsw{color:var(--flink)}
+
+.catphoto{aspect-ratio:4/3;object-fit:cover}
+.catphoto{aspect-ratio:4/3;object-fit:cover;background:#eadfd2}

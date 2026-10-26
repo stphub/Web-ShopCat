@@ -3,7 +3,7 @@ import PageBar from '../components/PageBar';
 import SiteNav from '../components/SiteNav';
 import PageHero from '../components/PageHero';
 import SiteFooter from '../components/SiteFooter';
-import CatArt from '../components/CatArt';
+import { ArticleImage } from '../components/CatArt';
 import { ARTICLES } from '../data/articles';
 import { useI18n } from '../i18n';
 
@@ -21,7 +21,7 @@ export default function Articles() {
           {ARTICLES.map((a) => (
             <li key={a.slug}>
               <Link className="artcard" to={'/articles/' + a.slug}>
-                <CatArt variant={a.art} />
+                <ArticleImage slug={a.slug} variant={a.art} />
                 <div className="artcardbody">
                   <h2>{a[L].title}</h2>
                   <p>{a[L].desc}</p>

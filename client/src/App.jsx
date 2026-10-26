@@ -1,4 +1,5 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
+import ScrollToTop from './components/ScrollToTop';
 import Shop from './pages/Shop';
 import AuthPage from './pages/AuthPage';
 import ForgotPassword from './pages/ForgotPassword';
@@ -20,6 +21,8 @@ import AdminProducts from './pages/AdminProducts';
 
 export default function App() {
   return (
+    <>
+    <ScrollToTop />
     <Routes>
       <Route path="/" element={<Shop />} />
       <Route path="/login" element={<AuthPage mode="login" />} />
@@ -42,5 +45,6 @@ export default function App() {
       <Route path="/admin/settings" element={<AdminShell><AdminSettings /></AdminShell>} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
+    </>
   );
 }

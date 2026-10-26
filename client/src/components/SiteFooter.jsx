@@ -26,7 +26,13 @@ export default function SiteFooter() {
   };
   const hasContact = info.lineId || info.facebook || info.phone || info.email || info.hours;
   return (
-    <footer>
+    <footer
+      onClick={(e) => {
+        // กดลิงก์ที่ลิงก์ไปหน้าที่เปิดอยู่แล้ว (path ไม่เปลี่ยน ScrollToTop จึงไม่ทำงาน) ให้เลื่อนขึ้นบนสุดเอง
+        const a = e.target.closest && e.target.closest('a[href^="/"]');
+        if (a && a.getAttribute('href').split(/[?#]/)[0] === window.location.pathname) window.scrollTo({ top: 0, behavior: 'smooth' });
+      }}
+    >
       <div className="wrap footcols">
         <nav aria-label={t('ลิงก์ด่วน')}>
           <h2>{t('ลิงก์ด่วน')}</h2>

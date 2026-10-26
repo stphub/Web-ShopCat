@@ -2,7 +2,7 @@ import { Link, Navigate, useParams } from 'react-router-dom';
 import PageBar from '../components/PageBar';
 import SiteNav from '../components/SiteNav';
 import SiteFooter from '../components/SiteFooter';
-import CatArt from '../components/CatArt';
+import { ArticleImage } from '../components/CatArt';
 import { ARTICLES, ARTICLE_BY_SLUG } from '../data/articles';
 import { useI18n } from '../i18n';
 
@@ -39,7 +39,7 @@ export default function Article() {
 
       <header className="arthero">
         <div className="wrap arthero-in">
-          <CatArt variant={a.art} className="arthero-art" title={c.title} />
+          <ArticleImage slug={a.slug} variant={a.art} className="arthero-art" title={c.title} />
           <div className="arthero-text">
             <span className="pill">{t('คู่มือดูแลแมว')}</span>
             <h1>{c.title}</h1>
@@ -64,7 +64,7 @@ export default function Article() {
         <p className="note artdisc">{t('ข้อมูลทั่วไปเพื่อประกอบการดูแลแมว ไม่ใช่คำแนะนำทางสัตวแพทย์ ถ้าแมวป่วย ตั้งท้อง หรือมีโรคประจำตัว ให้ปรึกษาสัตวแพทย์เสมอ')}</p>
 
         <section className="artcta">
-          <CatArt variant={a.art} className="artcta-art" />
+          <ArticleImage slug={a.slug} variant={a.art} className="artcta-art" />
           <div className="artcta-text">
             <h2>{t('เลือกอาหารเปียกให้เจ้านาย')}</h2>
             <p>{t('ดูอาหารแมวทั้งหมดในร้าน กรองตามอายุแมวได้ทันที')}</p>
