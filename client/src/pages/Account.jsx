@@ -11,7 +11,7 @@ import MyMessages from '../components/MyMessages';
 import SecurityQuestionPanel from '../components/SecurityQuestionPanel';
 import { api } from '../api';
 import { baht } from '../data/products';
-import { ORDER_STATUS, fmtDate, fmtDateTime } from '../data/orders';
+import { orderStatusLabel, fmtDate, fmtDateTime } from '../data/orders';
 import { useAuth } from '../context/AuthContext';
 import { useProducts } from '../context/ProductsContext';
 import { useCart } from '../context/CartContext';
@@ -313,7 +313,8 @@ export default function Account({ view = 'profile' }) {
                 <li key={o.id} className="ord">
                   <div className="ord-head">
                     <b className="num">{o.orderNo}</b>
-                    <span className={'status s-' + o.status}>{t(ORDER_STATUS[o.status])}</span>
+                    <span className={'status s-' + o.status}>{t(orderStatusLabel(o))}</span>
+                    {o.payMethod === 'cod' && <span className="meta">{t('ชำระเงินปลายทาง')}</span>}
                     <span className="meta">{fmtDateTime(o.createdAt)}</span>
                   </div>
                   <ul className="ord-items">
@@ -345,7 +346,10 @@ export default function Account({ view = 'profile' }) {
                     </p>
                   )}
                   <div className="meta">{t('ส่งไปที่')} {o.address.name} · {o.address.tel} · {o.address.line}</div>
-                  {o.status === 'pending' && (
+                  {o.status === 'pending' && o.payMethod === 'cod' && (
+                    <p className="note">{t('ร้านจะติดต่อยืนยันออเดอร์ และจัดส่งให้ ชำระเงินสดจำนวน {total} กับพนักงานส่งของเมื่อได้รับสินค้า', { total: baht(o.total) })}</p>
+                  )}
+                  {o.status === 'pending' && o.payMethod !== 'cod' && (
                     <PromptPayBox
                       order={o}
                       onChange={(n) => setOrders((list) => list.map((x) => (x.id === n.id ? n : x)))}

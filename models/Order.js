@@ -32,6 +32,8 @@ const orderSchema = new mongoose.Schema(
       tel: { type: String, required: true },
       line: { type: String, required: true },
     },
+    // promptpay = สแกนจ่าย (แนบสลิป นับถอยหลัง) / cod = ชำระเงินสดปลายทาง (ไม่ต้องแนบสลิป ไม่นับถอยหลัง)
+    payMethod: { type: String, enum: ['promptpay', 'cod'], default: 'promptpay' },
     status: { type: String, enum: STATUSES, default: 'pending', index: true },
     tracking: { type: String, maxlength: 60, default: '' },
     paidAt: Date,
@@ -76,6 +78,7 @@ orderSchema.methods.toPublic = function () {
     total: o.total,
     address: o.address,
     status: o.status,
+    payMethod: o.payMethod || 'promptpay',
     tracking: o.tracking || '',
     createdAt: o.createdAt,
     paidAt: o.paidAt || null,

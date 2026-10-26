@@ -9,6 +9,15 @@ export const ORDER_STATUS = {
   cancelled: 'ยกเลิกแล้ว',
 };
 
+// ป้ายสถานะที่คำนึงถึงวิธีชำระเงิน: ออเดอร์เก็บเงินปลายทางที่ยังไม่ยืนยันคือ "รอร้านยืนยัน" ไม่ใช่ "รอชำระเงิน"
+export function orderStatusLabel(o) {
+  if (o.payMethod === 'cod') {
+    if (o.status === 'pending') return 'รอร้านยืนยันออเดอร์';
+    if (o.status === 'paid') return 'ร้านยืนยันแล้ว เตรียมจัดส่ง';
+  }
+  return ORDER_STATUS[o.status];
+}
+
 export function fmtDateTime(v) {
   try {
     return new Date(v).toLocaleString(currentLocale(), { dateStyle: 'medium', timeStyle: 'short', timeZone: 'Asia/Bangkok' });

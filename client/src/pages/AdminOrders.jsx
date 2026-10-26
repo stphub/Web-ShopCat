@@ -2,7 +2,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { api } from '../api';
 import { baht } from '../data/products';
-import { ORDER_STATUS, fmtDate, fmtDateTime } from '../data/orders';
+import { ORDER_STATUS, orderStatusLabel, fmtDate, fmtDateTime } from '../data/orders';
 import { useProducts } from '../context/ProductsContext';
 
 const FILTERS = [['', 'ทั้งหมด'], ['pending', 'รอชำระเงิน'], ['paid', 'ชำระเงินแล้ว'], ['shipped', 'จัดส่งแล้ว'], ['received', 'ลูกค้ารับแล้ว'], ['cancelled', 'ยกเลิก']];
@@ -97,9 +97,10 @@ export default function AdminOrders() {
             <li key={o.id} className="ord panel">
               <div className="ord-head">
                 <b className="num">{o.orderNo}</b>
-                <span className={'status s-' + o.status}>{ORDER_STATUS[o.status]}</span>
+                <span className={'status s-' + o.status}>{orderStatusLabel(o)}</span>
+                {o.payMethod === 'cod' && <span className="slipbadge">เก็บเงินปลายทาง {baht(o.total)}</span>}
                 {o.cancelledByTimeout && <span className="meta">ยกเลิกอัตโนมัติ (ไม่ชำระตามเวลาที่กำหนด)</span>}
-                {o.status === 'pending' && o.hasSlip && <span className="slipbadge">แนบสลิปแล้ว รอตรวจ</span>}
+                {o.status === 'pending' && o.payMethod !== 'cod' && o.hasSlip && <span className="slipbadge">แนบสลิปแล้ว รอตรวจ</span>}
                 <span className="meta">{fmtDateTime(o.createdAt)}</span>
                 {o.customer && <span className="meta">ลูกค้า: {o.customer.name} ({o.customer.email})</span>}
               </div>
@@ -128,7 +129,7 @@ export default function AdminOrders() {
                 </div>
               )}
 
-              {(o.status === 'paid' || o.status === 'shipped') && (
+              {(o.status === 'paid' || o.status === 'shipped' || (o.status === 'pending' && o.payMethod === 'cod')) && (
                 <div className="trackrow">
                   <label htmlFor={'t-' + o.id}>เลขพัสดุ</label>
                   <input id={'t-' + o.id} value={trackValue} maxLength={60} onChange={(e) => setTrack({ ...track, [o.id]: e.target.value })} placeholder="เช่น TH0123456789" />
@@ -149,7 +150,14 @@ export default function AdminOrders() {
               <div className="actions">
                 {o.status === 'pending' && (
                   <>
-                    <button className="submit" disabled={busy} onClick={() => update(o, { status: 'paid' })}>ยืนยันว่าชำระเงินแล้ว</button>
+                    {o.payMethod === 'cod' ? (
+                      <>
+                        <button className="submit" disabled={busy} onClick={() => update(o, { status: 'paid' })}>ยืนยันออเดอร์</button>
+                        <button className="ghost" disabled={busy} onClick={() => update(o, { status: 'shipped', tracking: trackValue })}>จัดส่งเลย</button>
+                      </>
+                    ) : (
+                      <button className="submit" disabled={busy} onClick={() => update(o, { status: 'paid' })}>ยืนยันว่าชำระเงินแล้ว</button>
+                    )}
                     {o.hasSlip && <button className="ghost" disabled={busy} onClick={() => rejectSlip(o)}>สลิปไม่ถูกต้อง</button>}
                     <button className="ghost danger" disabled={busy} onClick={() => cancel(o)}>ยกเลิกออเดอร์</button>
                   </>
@@ -157,7 +165,7 @@ export default function AdminOrders() {
                 {o.status === 'paid' && (
                   <>
                     <button className="submit" disabled={busy} onClick={() => update(o, { status: 'shipped', tracking: trackValue })}>จัดส่งแล้ว</button>
-                    <button className="ghost" disabled={busy} onClick={() => update(o, { status: 'pending' })}>ย้อนเป็นรอชำระเงิน</button>
+                    <button className="ghost" disabled={busy} onClick={() => update(o, { status: 'pending' })}>{o.payMethod === 'cod' ? 'ย้อนเป็นรอยืนยัน' : 'ย้อนเป็นรอชำระเงิน'}</button>
                     <button className="ghost danger" disabled={busy} onClick={() => cancel(o)}>ยกเลิกออเดอร์</button>
                   </>
                 )}

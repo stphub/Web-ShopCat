@@ -4,7 +4,7 @@ import Art from './Art';
 import AddressFields from './AddressFields';
 import { api } from '../api';
 import { baht } from '../data/products';
-import { ORDER_STATUS } from '../data/orders';
+import { orderStatusLabel } from '../data/orders';
 import PromptPayBox from './PromptPayBox';
 import { useCart } from '../context/CartContext';
 import { useAuth } from '../context/AuthContext';
@@ -26,6 +26,7 @@ export default function CartDrawer({ open, onClose }) {
   const [err, setErr] = useState(null); // { message, field }
   const [notice, setNotice] = useState('');
   const [order, setOrder] = useState(null);
+  const [payMethod, setPayMethod] = useState('promptpay'); // promptpay = สแกนจ่าย, cod = ชำระเงินปลายทาง
 
   useEffect(() => {
     const onKey = (e) => e.key === 'Escape' && onClose();
@@ -45,6 +46,7 @@ export default function CartDrawer({ open, onClose }) {
     setErr(null);
     setNotice('');
     setOrder(null);
+    setPayMethod('promptpay');
   }, [uid]);
 
   // เปิดตะกร้าครั้งใหม่หลังสั่งซื้อเสร็จ ให้เริ่มที่หน้าตะกร้า
@@ -84,7 +86,7 @@ export default function CartDrawer({ open, onClose }) {
     setErr(null);
     setBusy(true);
     // ส่งเฉพาะรหัสสินค้ากับจำนวน ราคาและยอดรวมเซิร์ฟเวอร์คิดเอง
-    const payload = { items: cart.lines.map((l) => ({ productId: l.product.id, qty: l.qty })) };
+    const payload = { items: cart.lines.map((l) => ({ productId: l.product.id, qty: l.qty })), payMethod };
     if (sel !== 'new') payload.addressId = sel;
     else {
       payload.address = form;
@@ -127,8 +129,11 @@ export default function CartDrawer({ open, onClose }) {
               <div className="done">
                 <span className="donecheck" aria-hidden="true">&#10003;</span>
                 <h3>{t('ขอบคุณที่อุดหนุน')}</h3>
-                <p className="doneinfo num">{t('ออเดอร์')} <b>{order.orderNo}</b> · {t(ORDER_STATUS[order.status])}</p>
-                {order.status === 'pending' && (
+                <p className="doneinfo num">{t('ออเดอร์')} <b>{order.orderNo}</b> · {t(orderStatusLabel(order))}</p>
+                {order.status === 'pending' && order.payMethod === 'cod' && (
+                  <p className="note">{t('ร้านจะติดต่อยืนยันออเดอร์ และจัดส่งให้ ชำระเงินสดจำนวน {total} กับพนักงานส่งของเมื่อได้รับสินค้า', { total: baht(order.total) })}</p>
+                )}
+                {order.status === 'pending' && order.payMethod !== 'cod' && (
                   <PromptPayBox
                     order={order}
                     onChange={setOrder}
@@ -140,11 +145,17 @@ export default function CartDrawer({ open, onClose }) {
                     {t('ออเดอร์นี้ถูกยกเลิกอัตโนมัติ เพราะไม่ได้ชำระเงินภายใน {n} นาที สินค้าถูกคืนเข้าสต็อกแล้ว หากยังต้องการสั่ง กรุณาสั่งซื้อใหม่', { n: payMinutes })}
                   </p>
                 )}
-                <p className="note">
-                  {t('ชำระเงินแล้วแนบสลิปได้ที่นี่ หรือแนบทีหลังที่')}{' '}
-                  <Link to="/account/orders" onClick={onClose}>{t('คำสั่งซื้อของฉัน')}</Link>{' '}
-                  {t('เมื่อร้านตรวจสลิปและยืนยันแล้ว สถานะจะเปลี่ยนเป็น "ชำระเงินแล้ว"')}
-                </p>
+                {order.payMethod === 'cod' ? (
+                  <p className="note">
+                    {t('ติดตามสถานะได้ที่')} <Link to="/account/orders" onClick={onClose}>{t('คำสั่งซื้อของฉัน')}</Link>
+                  </p>
+                ) : (
+                  <p className="note">
+                    {t('ชำระเงินแล้วแนบสลิปได้ที่นี่ หรือแนบทีหลังที่')}{' '}
+                    <Link to="/account/orders" onClick={onClose}>{t('คำสั่งซื้อของฉัน')}</Link>{' '}
+                    {t('เมื่อร้านตรวจสลิปและยืนยันแล้ว สถานะจะเปลี่ยนเป็น "ชำระเงินแล้ว"')}
+                  </p>
+                )}
               </div>
             </div>
             <div className="dfoot">
@@ -188,9 +199,23 @@ export default function CartDrawer({ open, onClose }) {
                 </>
               )}
 
+              <fieldset className="addrpick paypick">
+                <legend>{t('วิธีชำระเงิน')}</legend>
+                <label className={'addropt' + (payMethod === 'promptpay' ? ' on' : '')}>
+                  <input type="radio" name="paym" checked={payMethod === 'promptpay'} onChange={() => setPayMethod('promptpay')} />
+                  <span><b>{t('สแกนจ่าย (พร้อมเพย์)')}</b><span className="meta block">{t('โอนผ่านแอปธนาคารแล้วแนบสลิป')}</span></span>
+                </label>
+                <label className={'addropt' + (payMethod === 'cod' ? ' on' : '')}>
+                  <input type="radio" name="paym" checked={payMethod === 'cod'} onChange={() => setPayMethod('cod')} />
+                  <span><b>{t('ชำระเงินปลายทาง')}</b><span className="meta block">{t('จ่ายเงินสดเมื่อได้รับสินค้า')}</span></span>
+                </label>
+              </fieldset>
+
               {err && <div className="err" role="alert">{err.message}</div>}
               <p className="note">
-                {t('หลังกดยืนยันคำสั่งซื้อ ต้องโอนเงินและแนบสลิปภายใน {n} นาที ไม่เช่นนั้นระบบจะยกเลิกออเดอร์ให้อัตโนมัติ', { n: payMinutes })}
+                {payMethod === 'cod'
+                  ? t('ร้านจะติดต่อยืนยันออเดอร์ก่อนจัดส่ง เตรียมเงินสดตามยอดไว้จ่ายตอนรับสินค้า')
+                  : t('หลังกดยืนยันคำสั่งซื้อ ต้องโอนเงินและแนบสลิปภายใน {n} นาที ไม่เช่นนั้นระบบจะยกเลิกออเดอร์ให้อัตโนมัติ', { n: payMinutes })}
               </p>
               <p className="note">
                 {t('ยอดที่ต้องชำระ {total} (สินค้า {sub} ค่าส่ง {ship})', { total: baht(cart.total), sub: baht(cart.subtotal), ship: cart.shipping ? baht(cart.shipping) : t('ฟรี') })}

@@ -1,6 +1,10 @@
 // พจนานุกรมไทย → อังกฤษ (info): คีย์คือข้อความไทยเดิมทุกตัวอักษร
 // หน้าเกี่ยวกับเรา / ติดต่อเรา / ช่วยเหลือ (ข้อความที่มี {x} ใช้จับคู่ตัวเลขที่แทรกอยู่)
 export default {
+  "ชำระเงินปลายทาง (เงินสด)": "Cash on delivery",
+  "ตอนชำระเงินเลือก \"ชำระเงินปลายทาง\" ออเดอร์จะอยู่ในสถานะ \"รอร้านยืนยันออเดอร์\" ไม่ต้องโอนเงินหรือแนบสลิป และไม่มีการนับเวลาถอยหลัง": "At checkout choose \"Cash on delivery\". The order shows as \"Awaiting store confirmation\"; no transfer or slip is needed and there is no countdown.",
+  "ร้านติดต่อยืนยันออเดอร์ แล้วจัดส่งพร้อมใส่เลขพัสดุ": "The shop contacts you to confirm, then ships with a tracking number.",
+  "จ่ายเงินสดตามยอดรวมในออเดอร์ให้พนักงานส่งของเมื่อรับสินค้า": "Pay the order total in cash to the courier when you receive the parcel.",
   "บทความ": "Articles",
   "บทความทั้งหมด": "All articles",
   "คู่มือดูแลแมวและเลือกอาหาร": "Cat care and food guides",

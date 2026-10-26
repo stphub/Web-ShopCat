@@ -1,5 +1,15 @@
 // พจนานุกรมไทย → อังกฤษ (shop): คีย์คือข้อความไทยเดิมทุกตัวอักษร
 export default {
+  "วิธีชำระเงิน": "Payment method",
+  "สแกนจ่าย (พร้อมเพย์)": "Scan to pay (PromptPay)",
+  "โอนผ่านแอปธนาคารแล้วแนบสลิป": "Transfer via your banking app, then attach the slip",
+  "ชำระเงินปลายทาง": "Cash on delivery",
+  "จ่ายเงินสดเมื่อได้รับสินค้า": "Pay cash when you receive the order",
+  "ร้านจะติดต่อยืนยันออเดอร์ก่อนจัดส่ง เตรียมเงินสดตามยอดไว้จ่ายตอนรับสินค้า": "We'll contact you to confirm before shipping. Please have the exact cash ready when the parcel arrives.",
+  "ร้านจะติดต่อยืนยันออเดอร์ และจัดส่งให้ ชำระเงินสดจำนวน {total} กับพนักงานส่งของเมื่อได้รับสินค้า": "We'll confirm your order and ship it. Pay {total} in cash to the courier on delivery.",
+  "ติดตามสถานะได้ที่": "Track your order at",
+  "รอร้านยืนยันออเดอร์": "Awaiting store confirmation",
+  "ร้านยืนยันแล้ว เตรียมจัดส่ง": "Confirmed, preparing to ship",
   // ตะกร้า / สั่งซื้อ
   'สั่งซื้อเรียบร้อย': 'Order placed',
   'ข้อมูลจัดส่ง': 'Delivery details',

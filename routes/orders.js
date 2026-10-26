@@ -16,12 +16,15 @@ const { STATUSES } = Order;
 
 // สถานะที่แอดมินเปลี่ยนต่อได้ (ยกเลิกแล้วคืนสต็อกให้อัตโนมัติ)
 const TRANSITIONS = {
-  pending: ['paid', 'cancelled'],
+  pending: ['paid', 'cancelled'], // ออเดอร์เก็บเงินปลายทาง (cod) ข้ามไป shipped ได้เลย (ดู COD_PENDING_EXTRA)
   paid: ['shipped', 'cancelled', 'pending'],
   shipped: [], // shipped -> received ลูกค้าเป็นคนกดเองเท่านั้น (แอดมินกดแทนไม่ได้)
   received: [],
   cancelled: [],
 };
+
+const COD_PENDING_EXTRA = 'shipped';
+const PAY_METHODS = ['promptpay', 'cod'];
 
 const SLIP_MAX_BYTES = 1024 * 1024;
 const slipLimiter = rateLimit({
@@ -137,6 +140,9 @@ customerRouter.post('/', orderLimiter, async (req, res) => {
     const shipping = subtotal >= FREE_SHIPPING_FROM ? 0 : SHIPPING_FEE;
     const total = subtotal + shipping;
 
+    const payMethod = body.payMethod === undefined ? 'promptpay' : String(body.payMethod);
+    if (!PAY_METHODS.includes(payMethod)) throw fail(400, 'วิธีชำระเงินไม่ถูกต้อง');
+
     // 3) ที่อยู่จัดส่ง: ใช้ที่บันทึกไว้ หรือกรอกใหม่
     let address;
     let inline = null;
@@ -166,7 +172,9 @@ customerRouter.post('/', orderLimiter, async (req, res) => {
           shipping,
           total,
           address,
-          payExpiresAt: new Date(Date.now() + PAY_WINDOW_MINUTES * 60 * 1000),
+          payMethod,
+          // เก็บเงินปลายทางไม่ต้องรีบโอน จึงไม่นับถอยหลังยกเลิกอัตโนมัติ
+          payExpiresAt: payMethod === 'cod' ? null : new Date(Date.now() + PAY_WINDOW_MINUTES * 60 * 1000),
         });
       } catch (e) {
         if (!(e && e.code === 11000)) throw e; // เลขออเดอร์ซ้ำ (แทบไม่เกิด) ให้สุ่มใหม่
@@ -241,6 +249,7 @@ customerRouter.post(
       const mine = await Order.findOne({ _id: req.params.id, user: req.user._id });
       if (!mine) throw fail(404, 'ไม่พบออเดอร์');
       if (mine.status === 'cancelled' && mine.cancelReason === 'timeout') throw fail(409, 'ออเดอร์นี้ถูกยกเลิกเพราะไม่ได้ชำระเงินภายในเวลาที่กำหนด กรุณาสั่งซื้อใหม่');
+      if (mine.payMethod === 'cod') throw fail(409, 'ออเดอร์นี้เลือกชำระเงินปลายทาง ไม่ต้องแนบสลิป');
       if (mine.status !== 'pending') throw fail(409, 'ออเดอร์นี้ไม่ได้รอชำระเงินแล้ว แนบสลิปไม่ได้');
       img = await Image.create({ data: buf, contentType: type, size: buf.length, kind: 'slip', owner: req.user._id });
       const before = mine.slip && mine.slip.image;
@@ -346,7 +355,8 @@ adminRouter.patch('/:id', async (req, res) => {
     }
 
     if (next !== cur.status) {
-      if (!TRANSITIONS[cur.status].includes(next)) {
+      const allowed = TRANSITIONS[cur.status].concat(cur.status === 'pending' && cur.payMethod === 'cod' ? [COD_PENDING_EXTRA] : []);
+      if (!allowed.includes(next)) {
         throw fail(409, 'เปลี่ยนสถานะจากนี้ไปเป็นสถานะที่เลือกไม่ได้');
       }
       set.status = next;
@@ -356,9 +366,12 @@ adminRouter.patch('/:id', async (req, res) => {
         set.paidAt = null;
         set.payExpiresAt = null; // แอดมินย้อนกลับเอง ไม่นับถอยหลังยกเลิกอัตโนมัติ
       }
-      if (next === 'shipped') set.shippedAt = now;
+      if (next === 'shipped') {
+        set.shippedAt = now;
+        if (cur.payMethod === 'cod' && cur.status === 'pending') set.payExpiresAt = null;
+      }
       if (next === 'cancelled') set.cancelledAt = now;
-    } else if (cur.status !== 'shipped' && cur.status !== 'paid' && body.tracking !== undefined) {
+    } else if (cur.status !== 'shipped' && cur.status !== 'paid' && !(cur.status === 'pending' && cur.payMethod === 'cod') && body.tracking !== undefined) {
       throw fail(409, 'ใส่เลขพัสดุได้เมื่อชำระเงินแล้วหรือจัดส่งแล้ว');
     }
     if (Object.keys(set).length === 0) return res.json({ order: cur.toPublic() });
@@ -384,7 +397,7 @@ adminRouter.post('/:id/reject-slip', async (req, res) => {
     const cur = await Order.findOne({ _id: req.params.id, status: 'pending', 'slip.image': { $exists: true, $ne: null } });
     if (!cur) throw fail(409, 'ไม่มีสลิปรอตรวจในออเดอร์นี้ (อาจถูกเปลี่ยนสถานะไปแล้ว)');
     const updated = await Order.findOneAndUpdate(
-      { _id: cur._id, status: 'pending' },
+      { _id: cur._id, status: 'pending', payMethod: { $ne: 'cod' } },
       { $unset: { 'slip.image': 1, 'slip.at': 1 }, 'slip.rejectNote': note, payExpiresAt: new Date(Date.now() + PAY_WINDOW_MINUTES * 60 * 1000) },
       { new: true }
     ).populate('user', 'name email');
