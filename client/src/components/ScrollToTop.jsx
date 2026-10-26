@@ -6,7 +6,7 @@ export default function ScrollToTop() {
   const { pathname, hash } = useLocation();
   useLayoutEffect(() => {
     if (hash) return;
-    window.scrollTo(0, 0);
+    window.scrollTo({ top: 0, left: 0, behavior: 'instant' }); // ต้องระบุ instant เพราะ html ตั้ง scroll-behavior: smooth ไว้
   }, [pathname]); // eslint-disable-line react-hooks/exhaustive-deps
   return null;
 }
