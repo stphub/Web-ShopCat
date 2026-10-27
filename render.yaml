@@ -20,5 +20,7 @@ services:
         value: 2 # หน้าเว็บอยู่ Vercel แล้วส่งต่อ /api มาที่นี่ (ผ่านพร็อกซี 2 ชั้น)
       - key: APP_URL
         sync: false # ที่อยู่หน้าเว็บบน Vercel เช่น https://cat-shop.vercel.app
+      - key: ALLOWED_ORIGINS
+        sync: false # (ไม่บังคับ) โดเมนอื่นของหน้าเว็บที่อนุญาตเรียก API คั่นด้วยจุลภาค เช่น https://www.myshop.com
       - key: GOOGLE_CLIENT_ID
         sync: false

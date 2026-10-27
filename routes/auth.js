@@ -35,6 +35,9 @@ const resetLimiter = rateLimit({
 // ตอบผิดครบ 5 ครั้ง ล็อกการกู้รหัสผ่านด้วยคำตอบ 30 นาที
 const MAX_SEC_FAILS = 5;
 const SEC_LOCK_MS = 30 * 60 * 1000;
+// ล็อกอินผิดครบ 8 ครั้งติดกัน ล็อกการล็อกอินบัญชีนั้น 15 นาที (นับต่อบัญชี ไม่ใช่ต่อ IP)
+const MAX_LOGIN_FAILS = 8;
+const LOGIN_LOCK_MS = 15 * 60 * 1000;
 const DUMMY_HASH = bcrypt.hashSync('dummy-answer', 10); // ใช้เทียบเวลาเมื่อไม่มีบัญชี
 const hashAnswer = (a) => bcrypt.hash(normalizeAnswer(a), 10);
 
@@ -124,10 +127,24 @@ router.post('/login', limiter, async (req, res) => {
   try {
     const email = String(req.body.email || '').trim().toLowerCase();
     const password = String(req.body.password || '');
-    const user = await User.findOne({ email }).select('+passwordHash');
+    const user = await User.findOne({ email }).select('+passwordHash +loginFails +loginLockUntil');
+    if (user && user.loginLockUntil && user.loginLockUntil > new Date()) {
+      const mins = Math.ceil((user.loginLockUntil.getTime() - Date.now()) / 60000);
+      return res.status(429).json({ error: 'ล็อกอินผิดหลายครั้ง บัญชีนี้ถูกล็อกชั่วคราว กรุณาลองใหม่ในอีก ' + mins + ' นาที หรือใช้ "ลืมรหัสผ่าน"' });
+    }
     // ข้อความเดียวกันทั้งกรณีไม่พบอีเมลและรหัสผ่านผิด เพื่อไม่บอกว่ามีอีเมลนี้ในระบบหรือไม่
     const ok = user && user.passwordHash && (await bcrypt.compare(password, user.passwordHash));
-    if (!ok) return res.status(401).json({ error: 'อีเมลหรือรหัสผ่านไม่ถูกต้อง' });
+    if (!ok) {
+      if (user) {
+        // นับแบบอะตอมมิก (ไม่พลาดเมื่อมีคำขอพร้อมกัน) ครบกำหนดแล้วตั้งเวลาล็อกและเริ่มนับใหม่
+        const upd = await User.findByIdAndUpdate(user._id, { $inc: { loginFails: 1 } }, { new: true }).select('+loginFails');
+        if (upd && upd.loginFails >= MAX_LOGIN_FAILS) {
+          await User.updateOne({ _id: user._id }, { loginFails: 0, loginLockUntil: new Date(Date.now() + LOGIN_LOCK_MS) });
+        }
+      }
+      return res.status(401).json({ error: 'อีเมลหรือรหัสผ่านไม่ถูกต้อง' });
+    }
+    if (user.loginFails || user.loginLockUntil) await User.updateOne({ _id: user._id }, { loginFails: 0, $unset: { loginLockUntil: 1 } });
     setSession(res, user);
     res.json({ user: user.toPublic() });
   } catch (e) {

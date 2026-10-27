@@ -44,6 +44,7 @@ app.use((req, res, next) => {
 });
 // ให้ผู้ให้บริการโฮสต์เช็กว่าเซิร์ฟเวอร์ยังทำงานอยู่
 app.get('/healthz', (req, res) => res.json({ ok: true }));
+app.use('/api', require('./lib/originCheck').originCheck());
 app.use(express.json({ limit: '10kb' }));
 app.use(cookieParser());
 

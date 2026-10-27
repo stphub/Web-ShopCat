@@ -21,6 +21,9 @@ const userSchema = new mongoose.Schema(
     secAHash: { type: String, select: false },
     secFails: { type: Number, default: 0, select: false },
     secLockUntil: { type: Date, select: false },
+    // ล็อกอินผิดติดกัน: นับครั้งและเวลาที่ล็อก (กันเดารหัสผ่านของบัญชีใดบัญชีหนึ่งแม้เปลี่ยน IP)
+    loginFails: { type: Number, default: 0, select: false },
+    loginLockUntil: { type: Date, select: false },
     resetTokenHash: { type: String, select: false },
     resetExpires: { type: Date, select: false },
   },
