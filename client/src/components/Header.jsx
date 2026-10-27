@@ -63,11 +63,6 @@ export default function Header({ query, onQuery, onOpenCart }) {
   const { user, loading, logout } = useAuth();
   const { count } = useCart();
   const wish = useWishlist();
-  const [sopen, setSopen] = useState(false);
-  const sref = useRef(null);
-  useEffect(() => {
-    if (sopen && sref.current) sref.current.focus();
-  }, [sopen]);
 
   return (
     <header className="top">
@@ -80,29 +75,6 @@ export default function Header({ query, onQuery, onOpenCart }) {
         <SiteNav />
 
         <div className="hdrtools">
-          {(sopen || query) && (
-            <div className="search">
-              <input
-                ref={sref}
-                type="search"
-                value={query}
-                onChange={(e) => onQuery(e.target.value)}
-                onKeyDown={(e) => {
-                  if (e.key === 'Escape') {
-                    onQuery('');
-                    setSopen(false);
-                  }
-                }}
-                onBlur={() => !query && setSopen(false)}
-                placeholder={t('ค้นหาสินค้า')}
-                aria-label={t('ค้นหาสินค้า')}
-              />
-            </div>
-          )}
-          <button type="button" className="hdricon searchbtn" aria-label={t('ค้นหาสินค้า')} aria-expanded={sopen || !!query} onClick={() => setSopen((v) => !v)}>
-            <Icon name="search" />
-          </button>
-
           <LangSwitch className="hdrlang" />
 
           <AccountMenu user={user} loading={loading} logout={logout} wishCount={wish.count} />
