@@ -1,5 +1,14 @@
 // พจนานุกรมไทย → อังกฤษ (shop): คีย์คือข้อความไทยเดิมทุกตัวอักษร
 export default {
+  "ค้นหาสินค้าสำหรับเจ้านาย...": "Search products for your boss...",
+  "ค้นหา": "Search",
+  "เจ้านายอยากได้": "Your boss wants",
+  "อาหารเปียก": "wet food",
+  "ทรายแมว": "cat litter",
+  "ขนมแมวเลีย": "lickable treats",
+  "ของเล่นแมว": "cat toys",
+  "ที่ลับเล็บ": "scratching posts",
+  "ที่นอนนุ่ม ๆ": "a cosy bed",
   "วิธีชำระเงิน": "Payment method",
   "สแกนจ่าย (พร้อมเพย์)": "Scan to pay (PromptPay)",
   "โอนผ่านแอปธนาคารแล้วแนบสลิป": "Transfer via your banking app, then attach the slip",

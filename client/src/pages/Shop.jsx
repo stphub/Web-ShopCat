@@ -10,6 +10,7 @@ import ProductDialog from '../components/ProductDialog';
 import { AGES, CATEGORIES } from '../data/products';
 import { useProducts } from '../context/ProductsContext';
 import { useI18n } from '../i18n';
+import { TypedWord, FloatDecor, CategoryTiles } from '../components/HeroExtras';
 
 export default function Shop() {
   const { t } = useI18n();
@@ -75,11 +76,19 @@ export default function Shop() {
         <span className="blob b1" aria-hidden="true" />
         <span className="blob b2" aria-hidden="true" />
         <span className="blob b3" aria-hidden="true" />
+        <FloatDecor />
         <div className="wrap hero2in">
-          <div>
+          <div className="herotext">
             <span className="pill">{t('ร้านของแมวออนไลน์')}</span>
             <h1>{t('ของใช้ของกินสำหรับ')}<em>{t('เจ้านาย')}</em> {t('ครบในที่เดียว')}</h1>
             <p>{t('อาหารเม็ด อาหารเปียก ขนม ทรายแมว ของเล่น และที่ลับเล็บ ซื้อครบ {price} ส่งฟรี', { price: baht(shipping.freeFrom) })}</p>
+            <form className="herosearch" role="search" onSubmit={(e) => { e.preventDefault(); goToProducts(); }}>
+              <Icon name="search" />
+              <label className="sr" htmlFor="hero-q">{t('ค้นหาสินค้า')}</label>
+              <input id="hero-q" type="search" value={query} onChange={(e) => setQuery(e.target.value)} placeholder={t('ค้นหาสินค้าสำหรับเจ้านาย...')} autoComplete="off" />
+              <button type="submit">{t('ค้นหา')}</button>
+            </form>
+            <p className="wantline">{t('เจ้านายอยากได้')} <TypedWord /></p>
             <div className="ctabtns left">
               <a className="cbtn cb-hot" href="#products">{t('เลือกซื้อสินค้า')}</a>
               <Link className="cbtn cb-glass" to="/contact">{t('ติดต่อเรา')}</Link>
@@ -104,6 +113,8 @@ export default function Shop() {
           <li><span className="cicon"><Icon name="undo" /></span><b>{t('แจ้งคืนสินค้าได้')}</b><div>{t('ภายใน {n} วันหลังรับสินค้า พร้อมแนบรูปในเว็บ', { n: returnDays })}</div></li>
           <li><span className="cicon"><Icon name="chat" /></span><b>{t('ถามร้านได้ทุกเมื่อ')}</b><div><Link to="/contact">{t('ติดต่อเรา')}</Link> {t('ทางโทร LINE หรืออีเมล')}</div></li>
         </ul>
+
+        <CategoryTiles categories={CATEGORIES} current={cat} onPick={setCat} />
 
         <div className="tools" id="products">
           <div className="chips" role="group" aria-label={t('หมวดสินค้า')}>
