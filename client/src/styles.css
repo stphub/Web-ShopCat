@@ -977,3 +977,14 @@ html.minimal .fd{opacity:.35}
 
 .hero2in>*{min-width:0}
 @media (max-width:600px){.floatdecor{display:none}}
+
+/* ส่วนหัวหน้าแรกกระชับขึ้น ให้เห็นปุ่ม "เลือกซื้อสินค้า" โดยไม่ต้องเลื่อนลงบนจอทั่วไป */
+.hero2{padding-block:36px 96px}
+html.minimal .hero2{padding-block:28px 36px}
+.hero2 .pill{margin-bottom:12px}
+.hero2 h1{font-size:clamp(30px,4.4vw,52px);line-height:1.18}
+.hero2 p{margin-top:10px}
+.herosearch{margin-top:18px}
+.wantline{margin-top:12px!important}
+.hero2 .ctabtns.left{margin-top:16px}
+@media (max-width:820px){.hero2{padding-block:28px 90px}html.minimal .hero2{padding-block:24px 28px}}
