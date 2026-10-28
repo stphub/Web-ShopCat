@@ -58,7 +58,13 @@ function Dropdown({ item, pathname, here }) {
   }, [open]);
 
   return (
-    <div className="navdrop" ref={ref} onMouseEnter={() => setOpen(true)} onMouseLeave={() => setOpen(false)}>
+    // เมาส์ชี้แล้วเปิดเมนู (เฉพาะเมาส์จริง) บนจอสัมผัสให้เปิด/ปิดด้วยการแตะเท่านั้น ไม่งั้นแตะแล้วเมนูเปิดแล้วปิดทันที
+    <div
+      className="navdrop"
+      ref={ref}
+      onPointerEnter={(e) => e.pointerType === 'mouse' && setOpen(true)}
+      onPointerLeave={(e) => e.pointerType === 'mouse' && setOpen(false)}
+    >
       <button type="button" className={'navitem' + (active ? ' on' : '')} aria-expanded={open} onClick={() => setOpen((o) => !o)}>
         {t(item.label)}
         <Chevron open={open} />

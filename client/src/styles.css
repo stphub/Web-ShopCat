@@ -1023,3 +1023,11 @@ html.minimal .hero2{padding-block:28px 36px}
 }
 @keyframes cbup{from{transform:translateY(120%);opacity:0}to{transform:none;opacity:1}}
 @media (prefers-reduced-motion:reduce){.cartbar{animation:none}.zoomframe .art{transition:none}}
+
+/* เมนู "สินค้า" บนมือถือแนวตั้ง: กางเต็มความกว้างจอใต้แถบหัวเว็บ (เดิมชิดขวาแล้วล้นออกซ้ายนอกจอ) เลื่อนดูได้ถ้ายาวกว่าจอ */
+@media (max-width:720px){
+  .navdrop{position:static}
+  .navstrip{position:relative}
+  html:root .navmenu,html:root .navdrop:last-child .navmenu{position:absolute;left:12px;right:12px;top:100%;min-width:0;width:auto;max-height:calc(100dvh - 150px);overflow-y:auto;overscroll-behavior:contain;margin-top:4px}
+  .navmenu a{padding:13px 14px}
+}
