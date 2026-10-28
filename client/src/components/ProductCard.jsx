@@ -5,9 +5,11 @@ import WishButton from './WishButton';
 import { baht } from '../data/products';
 import { useCart } from '../context/CartContext';
 import { useI18n } from '../i18n';
+import { useToast } from '../context/ToastContext';
 
 export default function ProductCard({ product, onOpen }) {
   const { change } = useCart();
+  const toast = useToast();
   const { t, pname, psize } = useI18n();
   const [added, setAdded] = useState(false);
   const timer = useRef(null);
@@ -18,6 +20,7 @@ export default function ProductCard({ product, onOpen }) {
 
   const add = () => {
     change(product.id, 1);
+    toast.cartAdded(pname(product));
     setAdded(true);
     clearTimeout(timer.current);
     timer.current = setTimeout(() => setAdded(false), 900);

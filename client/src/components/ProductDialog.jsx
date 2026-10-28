@@ -7,6 +7,7 @@ import ReviewPhotoPicker from './ReviewPhotoPicker';
 import { api } from '../api';
 import { baht } from '../data/products';
 import { useI18n } from '../i18n';
+import { useToast } from '../context/ToastContext';
 import Avatar from './Avatar';
 import ReviewerDialog from './ReviewerDialog';
 import { ZoomFrame, Lightbox } from './PhotoViewer';
@@ -28,6 +29,7 @@ export default function ProductDialog({ productId, onClose }) {
   };
   const [viewReviewer, setViewReviewer] = useState(null);
   const { change } = useCart();
+  const toast = useToast();
   const product = byId[productId];
 
   const [data, setData] = useState(null);
@@ -208,6 +210,7 @@ export default function ProductDialog({ productId, onClose }) {
                   disabled={out}
                   onClick={() => {
                     change(product.id, 1);
+                    toast.cartAdded(pname(product));
                     setAdded(true);
                     setTimeout(() => setAdded(false), 900);
                   }}

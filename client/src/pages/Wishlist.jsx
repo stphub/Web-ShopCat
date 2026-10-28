@@ -11,6 +11,7 @@ import { useCart } from '../context/CartContext';
 import { useProducts } from '../context/ProductsContext';
 import { useWishlist } from '../context/WishlistContext';
 import { useI18n } from '../i18n';
+import { useOpenCartEvent } from '../context/ToastContext';
 
 // หน้ารายการโปรดของฉัน: สินค้าที่กดหัวใจไว้ (ใหม่สุดก่อน)
 export default function Wishlist() {
@@ -21,6 +22,7 @@ export default function Wishlist() {
   const { count } = useCart();
   const [openId, setOpenId] = useState(null);
   const [cartOpen, setCartOpen] = useState(false);
+  useOpenCartEvent(() => setCartOpen(true));
 
   if (loading) return <div className="authwrap"><p className="sub">{t('กำลังโหลด...')}</p></div>;
   if (!user) return <Navigate to="/login" replace />;

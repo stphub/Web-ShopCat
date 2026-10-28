@@ -1,5 +1,8 @@
 // พจนานุกรมไทย → อังกฤษ (shop): คีย์คือข้อความไทยเดิมทุกตัวอักษร
 export default {
+  "เพิ่มลงตะกร้าแล้ว": "Added to cart",
+  "เพิ่มลงตะกร้าแล้ว (กดเพิ่ม {n} ครั้ง)": "Added to cart (added {n} times)",
+  "ดูตะกร้า": "View cart",
   "กดเพื่อขยายรูป": "Click to enlarge",
   "ปิดรูป": "Close photo",
   "ค้นหาสินค้าสำหรับเจ้านาย...": "Search products for your boss...",

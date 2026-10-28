@@ -13,6 +13,7 @@ import { useI18n } from '../i18n';
 import { TypedWord, FloatDecor, CategoryTiles } from '../components/HeroExtras';
 import { MobileCartBar } from '../components/PhotoViewer';
 import { useCart } from '../context/CartContext';
+import { useOpenCartEvent } from '../context/ToastContext';
 
 export default function Shop() {
   const { t } = useI18n();
@@ -54,6 +55,8 @@ export default function Shop() {
     if (Math.abs(top) < 24) return;
     window.scrollTo({ top: Math.max(0, window.scrollY + top), behavior: 'smooth' });
   };
+  // ปุ่ม "ดูตะกร้า" ในข้อความแจ้งเตือนส่งเหตุการณ์นี้มา (preventDefault = บอกว่าหน้านี้เปิดตะกร้าให้แล้ว)
+  useOpenCartEvent(() => setCartOpen(true));
   const firstCat = useRef(true);
   useEffect(() => {
     if (firstCat.current) {
@@ -138,7 +141,20 @@ export default function Shop() {
         <p className="count">{t('แสดง {n} จาก {total} รายการ', { n: list.length, total: PRODUCTS.length })}</p>
         <div className="grid">
           {loading ? (
-            <div className="empty">{t('กำลังโหลดสินค้า...')}</div>
+            <>
+              <span className="sr" role="status">{t('กำลังโหลดสินค้า...')}</span>
+              {Array.from({ length: 8 }, (_, i) => (
+                <div key={i} className="card skel" aria-hidden="true">
+                  <div className="skart" />
+                  <div className="skbody">
+                    <span className="skline w80" />
+                    <span className="skline w40" />
+                    <span className="skline w50" />
+                    <span className="skbtn" />
+                  </div>
+                </div>
+              ))}
+            </>
           ) : error ? (
             <div className="empty">
               {t('โหลดสินค้าไม่สำเร็จ:')} {error}

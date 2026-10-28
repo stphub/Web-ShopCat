@@ -1031,3 +1031,29 @@ html.minimal .hero2{padding-block:28px 36px}
   html:root .navmenu,html:root .navdrop:last-child .navmenu{position:absolute;left:12px;right:12px;top:100%;min-width:0;width:auto;max-height:calc(100dvh - 150px);overflow-y:auto;overscroll-behavior:contain;margin-top:4px}
   .navmenu a{padding:13px 14px}
 }
+
+/* ===== ข้อความแจ้งเมื่อเพิ่มลงตะกร้า (toast) ===== */
+.toastwrap{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:70;width:min(440px,calc(100vw - 24px));pointer-events:none;display:grid;justify-items:stretch}
+.toast{pointer-events:auto;display:flex;align-items:center;gap:12px;padding:12px 12px 12px 14px;border-radius:14px;background:var(--ink,#1c1c1c);color:#fff;box-shadow:0 12px 32px rgba(0,0,0,.3);animation:toastin .28s cubic-bezier(.2,.9,.3,1.2) both}
+.toastok{flex:none;width:26px;height:26px;border-radius:50%;background:#2e9d5b;display:grid;place-items:center;font-size:14px;font-weight:700}
+.toasttxt{flex:1;min-width:0;display:grid;gap:1px;line-height:1.35}
+.toasttxt b{font-weight:600;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.toasttxt span{font-size:13px;color:rgba(255,255,255,.75)}
+.toastact{flex:none;border:0;border-radius:10px;padding:8px 14px;font:inherit;font-weight:600;font-size:14px;background:#fff;color:#1c1c1c;cursor:pointer}
+.toastact:hover{filter:brightness(.92)}
+.toastx{flex:none;border:0;background:none;color:rgba(255,255,255,.6);cursor:pointer;font-size:14px;padding:6px}
+.toastx:hover{color:#fff}
+@keyframes toastin{from{opacity:0;transform:translateY(16px) scale(.96)}to{opacity:1;transform:none}}
+@media (max-width:720px){.toastwrap{bottom:calc(84px + env(safe-area-inset-bottom,0px))}}
+@media (prefers-reduced-motion:reduce){.toast{animation:none}}
+
+/* ===== โครงโหลดสินค้า (skeleton) ===== */
+.card.skel{animation:none;pointer-events:none}
+.skart,.skline,.skbtn{background:linear-gradient(100deg,var(--line,#e8e4de) 30%,color-mix(in srgb,var(--line,#e8e4de) 40%,#fff) 50%,var(--line,#e8e4de) 70%);background-size:300% 100%;animation:shimmer 1.4s linear infinite}
+.skart{aspect-ratio:4/3}
+.skbody{padding:14px 14px 16px;display:grid;gap:10px}
+.skline{display:block;height:12px;border-radius:6px}
+.skline.w80{width:80%;height:14px}.skline.w50{width:50%}.skline.w40{width:40%}
+.skbtn{height:38px;border-radius:10px;margin-top:6px}
+@keyframes shimmer{from{background-position:100% 0}to{background-position:-100% 0}}
+@media (prefers-reduced-motion:reduce){.skart,.skline,.skbtn{animation:none}}
