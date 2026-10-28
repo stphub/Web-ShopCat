@@ -9,6 +9,7 @@ import { baht } from '../data/products';
 import { useI18n } from '../i18n';
 import Avatar from './Avatar';
 import ReviewerDialog from './ReviewerDialog';
+import { ZoomFrame, Lightbox } from './PhotoViewer';
 import { useAuth } from '../context/AuthContext';
 import { useCart } from '../context/CartContext';
 import { useProducts } from '../context/ProductsContext';
@@ -39,6 +40,9 @@ export default function ProductDialog({ productId, onClose }) {
   const [notice, setNotice] = useState('');
   const [added, setAdded] = useState(false);
   const [shot, setShot] = useState(0); // รูปที่กำลังดูในแกลเลอรี
+  const [lb, setLb] = useState(false); // เปิดดูรูปเต็มจอ
+  const lbRef = useRef(false);
+  lbRef.current = lb;
 
   const dialogRef = useRef(null);
   const closeRef = useRef(null);
@@ -71,7 +75,7 @@ export default function ProductDialog({ productId, onClose }) {
   useEffect(() => {
     const prev = document.activeElement;
     const onKey = (e) => {
-      if (e.key === 'Escape') closeCb.current();
+      if (e.key === 'Escape' && !lbRef.current) closeCb.current(); // ตอนดูรูปเต็มจอ Esc ปิดแค่รูป
     };
     document.addEventListener('keydown', onKey);
     const prevOverflow = document.body.style.overflow;
@@ -161,7 +165,10 @@ export default function ProductDialog({ productId, onClose }) {
           <div className="dpad">
             <div className="pd-top">
               <div className="pd-art">
-                <Art product={shots.length ? { ...product, imageUrl: shots[Math.min(shot, shots.length - 1)].url } : product} />
+                <ZoomFrame enabled={shots.length > 0} onOpen={() => setLb(true)} onSwipe={(d) => setShot((i) => (i + d + shots.length) % shots.length)}>
+                  <Art product={shots.length ? { ...product, imageUrl: shots[Math.min(shot, shots.length - 1)].url } : product} />
+                </ZoomFrame>
+                {lb && shots.length > 0 && <Lightbox photos={shots} index={Math.min(shot, shots.length - 1)} onIndex={setShot} onClose={() => setLb(false)} alt={pname(product)} />}
                 {shots.length > 1 && (
                   <>
                     <button type="button" className="gnav prev" onClick={() => setShot((i) => (i - 1 + shots.length) % shots.length)} aria-label={t('รูปก่อนหน้า')}>&#8249;</button>

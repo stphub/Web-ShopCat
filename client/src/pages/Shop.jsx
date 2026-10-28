@@ -11,9 +11,12 @@ import { AGES, CATEGORIES } from '../data/products';
 import { useProducts } from '../context/ProductsContext';
 import { useI18n } from '../i18n';
 import { TypedWord, FloatDecor, CategoryTiles } from '../components/HeroExtras';
+import { MobileCartBar } from '../components/PhotoViewer';
+import { useCart } from '../context/CartContext';
 
 export default function Shop() {
   const { t } = useI18n();
+  const cartSum = useCart();
   const { products: PRODUCTS, loading, error, reload, shipping, returnDays } = useProducts();
   // หมวดสินค้าอยู่ใน URL (/?cat=food) เมนู "สินค้า" ด้านบนจึงลิงก์เข้าหมวดได้ และรีเฟรชแล้วหมวดไม่หาย
   const [sp, setSp] = useSearchParams();
@@ -151,6 +154,7 @@ export default function Shop() {
 
       <SiteFooter />
 
+      <MobileCartBar count={cartSum.count} total={cartSum.total} onOpen={() => setCartOpen(true)} hidden={cartOpen || !!openId} />
       <CartDrawer open={cartOpen} onClose={() => setCartOpen(false)} />
       {openId && <ProductDialog productId={openId} onClose={() => setOpenId(null)} />}
     </>

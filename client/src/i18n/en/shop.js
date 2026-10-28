@@ -1,5 +1,7 @@
 // พจนานุกรมไทย → อังกฤษ (shop): คีย์คือข้อความไทยเดิมทุกตัวอักษร
 export default {
+  "กดเพื่อขยายรูป": "Click to enlarge",
+  "ปิดรูป": "Close photo",
   "ค้นหาสินค้าสำหรับเจ้านาย...": "Search products for your boss...",
   "ค้นหา": "Search",
   "เจ้านายอยากได้": "Your boss wants",

@@ -988,3 +988,38 @@ html.minimal .hero2{padding-block:28px 36px}
 .wantline{margin-top:12px!important}
 .hero2 .ctabtns.left{margin-top:16px}
 @media (max-width:820px){.hero2{padding-block:28px 90px}html.minimal .hero2{padding-block:24px 28px}}
+
+/* ===== ซูมรูปสินค้า + ดูรูปเต็มจอ ===== */
+.zoomframe{position:relative;overflow:hidden;border-radius:14px;cursor:zoom-in;outline-offset:3px;touch-action:pan-y}
+.zoomframe .art{transition:transform .18s ease-out;transform-origin:var(--zx,50%) var(--zy,50%)}
+.zoomframe.zooming .art{transform:scale(2)}
+.zoomhint{position:absolute;right:8px;bottom:8px;width:30px;height:30px;border-radius:50%;background:rgba(0,0,0,.5);color:#fff;display:grid;place-items:center;font-size:14px;pointer-events:none;transition:opacity .2s}
+.zoomframe.zooming .zoomhint{opacity:0}
+.lbscrim{position:fixed;inset:0;z-index:100;background:rgba(8,10,12,.94);display:grid;place-items:center;padding:56px 16px 48px}
+.lbstage{max-width:min(94vw,1100px);max-height:calc(100dvh - 110px);overflow:hidden;border-radius:12px;display:grid;place-items:center;touch-action:pan-y}
+.lbstage img{display:block;max-width:100%;max-height:calc(100dvh - 110px);object-fit:contain;cursor:zoom-in;transition:transform .2s ease-out;user-select:none;-webkit-user-drag:none}
+.lbstage.zoomed img{cursor:zoom-out}
+.lbx,.lbnav{position:absolute;z-index:2;border:0;border-radius:50%;background:rgba(255,255,255,.14);color:#fff;cursor:pointer;display:grid;place-items:center;transition:background .15s}
+.lbx:hover,.lbnav:hover{background:rgba(255,255,255,.28)}
+.lbx{top:14px;right:14px;width:42px;height:42px;font-size:18px}
+.lbnav{top:50%;transform:translateY(-50%);width:46px;height:46px;font-size:30px;padding-bottom:4px}
+.lbnav.prev{left:12px}.lbnav.next{right:12px}
+.lbcount{position:absolute;bottom:14px;left:50%;transform:translateX(-50%);color:rgba(255,255,255,.8);font-size:14px}
+@media (max-width:560px){.lbnav{width:38px;height:38px;font-size:24px}.lbnav.prev{left:6px}.lbnav.next{right:6px}}
+
+/* ===== แถบตะกร้าลอยบนมือถือ ===== */
+.cartbar{display:none}
+@media (max-width:720px){
+  .cartbar{display:flex;position:fixed;left:12px;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:30;align-items:center;justify-content:space-between;gap:12px;
+    border:0;border-radius:16px;padding:14px 18px;font:inherit;font-weight:600;color:#fff;background:var(--ink,#1c1c1c);box-shadow:0 10px 28px rgba(0,0,0,.28);animation:cbup .3s ease-out both;cursor:pointer}
+  .cartbar .cb-left{display:flex;align-items:center;gap:10px}
+  .cartbar .cb-icon{position:relative;font-size:20px;line-height:1}
+  .cartbar .cb-icon b{position:absolute;top:-8px;right:-12px;min-width:18px;height:18px;padding:0 4px;border-radius:9px;background:var(--accent,#d97706);color:#fff;font-size:11px;display:grid;place-items:center}
+  .cartbar .cb-right{display:flex;align-items:center;gap:6px;font-size:16px}
+  .cartbar .cb-right i{font-style:normal;font-size:22px;line-height:1}
+  .cartbar:active{transform:scale(.98)}
+  body{padding-bottom:0}
+  footer{padding-bottom:calc(72px + env(safe-area-inset-bottom,0px))}
+}
+@keyframes cbup{from{transform:translateY(120%);opacity:0}to{transform:none;opacity:1}}
+@media (prefers-reduced-motion:reduce){.cartbar{animation:none}.zoomframe .art{transition:none}}
