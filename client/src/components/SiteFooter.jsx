@@ -38,6 +38,7 @@ export default function SiteFooter() {
           <h2>{t('ลิงก์ด่วน')}</h2>
           <ul>
             <li><Link to="/">{t('สินค้าทั้งหมด')}</Link></li>
+            <li><Link to="/calculator">{t('เครื่องคำนวณอาหาร')}</Link></li>
             <li><Link to="/about">{t('เกี่ยวกับเรา')}</Link></li>
             <li><Link to="/contact">{t('ติดต่อเรา')}</Link></li>
           </ul>

@@ -31,6 +31,11 @@ export default function Articles() {
             </li>
           ))}
         </ul>
+        <Link className="calclink panel" to="/calculator">
+          <span className="calcicon" aria-hidden="true">&#129518;</span>
+          <span><b>{t('เครื่องคำนวณปริมาณอาหารต่อวัน')}</b><span className="meta block">{t('กรอกน้ำหนักและช่วงวัยของแมว ได้ปริมาณอาหารเม็ดและเปียกต่อวัน')}</span></span>
+          <span aria-hidden="true">&rarr;</span>
+        </Link>
       </main>
       <SiteFooter />
     </div>

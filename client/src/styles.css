@@ -1057,3 +1057,36 @@ html.minimal .hero2{padding-block:28px 36px}
 .skbtn{height:38px;border-radius:10px;margin-top:6px}
 @keyframes shimmer{from{background-position:100% 0}to{background-position:-100% 0}}
 @media (prefers-reduced-motion:reduce){.skart,.skline,.skbtn{animation:none}}
+
+/* เครื่องคำนวณอาหาร */
+.calc{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+.calcform,.calcres{display:flex;flex-direction:column;gap:14px}
+.calcform h2,.calcres h2{margin:0;font-size:18px}
+.calcform .csub{margin-top:6px}
+.cfield{display:flex;flex-direction:column;gap:6px;border:0;padding:0;margin:0;min-width:0}
+.cfield>span,.cfield>legend{font-size:14px;font-weight:600;padding:0}
+.cfield input[type=number],.cfield select{font:inherit;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:inherit;width:100%;min-height:44px}
+.cfield input[type=range]{width:100%}
+.cerr{color:var(--danger,#c0392b);font-size:13px;font-style:normal}
+.cseg{flex-direction:row;flex-wrap:wrap;gap:8px}
+.cseg>legend{width:100%;margin-bottom:2px}
+.cseg button{flex:1 1 auto;min-height:44px;padding:8px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:inherit;font:inherit;cursor:pointer}
+.cseg button[aria-pressed=true]{background:var(--accent,#e8743b);border-color:var(--accent,#e8743b);color:#fff;font-weight:600}
+.cbig{display:flex;flex-wrap:wrap;align-items:baseline;gap:6px}
+.cbig b{font-size:40px;line-height:1.1}
+.cbig small{flex-basis:100%;color:var(--muted)}
+.cport,.ctips{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.cport li{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 12px;padding:12px;border:1px solid var(--line);border-radius:12px}
+.cport li span{flex:1 1 100px;font-weight:600}
+.cport li b{font-size:22px}
+.cport li small{flex-basis:100%;color:var(--muted)}
+.cmeal{margin:0}
+.ctips li{font-size:14px;color:var(--muted);padding-left:16px;position:relative}
+.ctips li::before{content:"•";position:absolute;left:2px}
+.calcnext{display:flex;flex-wrap:wrap;gap:8px}
+.calcnext a{text-decoration:none;display:inline-flex;align-items:center;min-height:44px;padding:0 16px}
+.calclink{display:flex;align-items:center;gap:14px;margin-top:20px;text-decoration:none;color:inherit}
+.calclink>span:nth-child(2){flex:1;min-width:0}
+.calclink .block{display:block}
+.calcicon{font-size:28px}
+@media(max-width:760px){.calc{grid-template-columns:1fr}.cbig b{font-size:34px}}

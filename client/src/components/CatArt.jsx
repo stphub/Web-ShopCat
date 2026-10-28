@@ -215,7 +215,46 @@ function Bowl({ x, y, s = 1 }) {
   );
 }
 
+function LitterBox({ x, y, s = 1 }) {
+  return (
+    <g transform={`translate(${x} ${y}) scale(${s})`}>
+      <ellipse cx="2" cy="30" rx="64" ry="9" fill="#2b1d12" opacity=".25" />
+      <defs>
+        <linearGradient id="lb-body" x1="0" y1="0" x2="1" y2="0">
+          <stop offset="0" stopColor="#7fa7b8" />
+          <stop offset="0.35" stopColor="#bcd8e4" />
+          <stop offset="1" stopColor="#6c95a8" />
+        </linearGradient>
+        <linearGradient id="lb-sand" x1="0" y1="0" x2="0" y2="1">
+          <stop offset="0" stopColor="#efe0c2" />
+          <stop offset="1" stopColor="#cdb98f" />
+        </linearGradient>
+      </defs>
+      <path d="M-62 -8 h124 l-8 36 a8 8 0 0 1 -8 6 h-92 a8 8 0 0 1 -8 -6z" fill="url(#lb-body)" />
+      <path d="M-62 -8 h124" stroke="#e9f3f7" strokeWidth="6" strokeLinecap="round" />
+      <path d="M-54 -4 h108 l-4 14 h-100z" fill="url(#lb-sand)" />
+      <g fill="#b8a273" opacity=".7">{[[-34, 2], [-12, 5], [10, 1], [30, 6], [-2, 9], [22, 10]].map(([cx, cy], i) => <circle key={i} cx={cx} cy={cy} r="2.2" />)}</g>
+      <path d="M44 -2 l16 -3 l-4 8z" fill="#9aa6a0" opacity=".9" />
+      <path d="M-52 18 q6 12 20 14" stroke="#fff" strokeWidth="3" fill="none" opacity=".4" strokeLinecap="round" />
+    </g>
+  );
+}
+
+function Yarn({ x, y, s = 1 }) {
+  return (
+    <g transform={`translate(${x} ${y}) scale(${s})`}>
+      <ellipse cx="2" cy="22" rx="24" ry="5" fill="#2b1d12" opacity=".22" />
+      <circle cx="0" cy="0" r="22" fill="#d9577a" />
+      <path d="M-18 -8 q18 -14 36 0 M-21 2 q21 -12 42 2 M-18 12 q18 -8 36 -2 M-8 -20 q-8 20 4 40 M8 -20 q10 20 -2 40" stroke="#f3a2b8" strokeWidth="2.2" fill="none" opacity=".85" />
+      <path d="M20 14 q16 8 34 4" stroke="#d9577a" strokeWidth="3" fill="none" strokeLinecap="round" />
+    </g>
+  );
+}
+
 const SCENES = {
+  litter: { wall: ['#e8e1f0', '#cfc4e0'], floor: ['#b99a6e', '#8c6d46'] },
+  duo: { wall: ['#f6e3c4', '#ecc995'], floor: ['#b7875a', '#8a5f39'] },
+  kitten: { wall: ['#f8dde6', '#efc2d1'], floor: ['#c39a6b', '#946d45'] },
   can: { wall: ['#f3d9c2', '#e7bfa0'], floor: ['#b98253', '#8d5c37'] },
   bowl: { wall: ['#d7e6ea', '#b4cdd6'], floor: ['#c39a6b', '#946d45'] },
   family: { wall: ['#e1ead3', '#c6d9ae'], floor: ['#b89463', '#8a6a42'] },
@@ -266,6 +305,26 @@ function CatSvg({ variant = 'can', title = '', className = '' }) {
         <>
           <Cat uid={id + '-a'} x={104} y={166} s={1.05} look={4} tail={0} fur="#8d8f94" stripe="#5d5f64" belly="#eceff1" eye="#7fb04a" />
           <Bowl x={230} y={194} s={1} />
+        </>
+      )}
+      {variant === 'litter' && (
+        <>
+          <LitterBox x={226} y={176} s={1.05} />
+          <Cat uid={id + '-a'} x={98} y={170} s={1} look={4} tail={0} fur="#f1e6d6" stripe="#c9b8a0" belly="#fffaf0" eye="#6fa0c8" />
+        </>
+      )}
+      {variant === 'duo' && (
+        <>
+          <Cat uid={id + '-a'} x={90} y={170} s={1} look={3} fur="#3f3a37" stripe="#26221f" belly="#f2ece4" eye="#d6b030" />
+          <Can x={190} y={160} s={1} />
+          <Bowl x={262} y={194} s={0.8} />
+        </>
+      )}
+      {variant === 'kitten' && (
+        <>
+          <Cat uid={id + '-a'} x={92} y={184} s={0.66} kitten look={4} fur="#e8a15a" stripe="#b8702d" eye="#6aa7d8" tail={0} />
+          <Cat uid={id + '-b'} x={196} y={186} s={0.58} kitten look={-3} fur="#bdb7b0" stripe="#8d867e" belly="#f1ede8" eye="#7fb04a" tail={2} />
+          <Yarn x={268} y={186} s={0.9} />
         </>
       )}
       {variant === 'family' && (

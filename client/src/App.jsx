@@ -8,6 +8,7 @@ import About from './pages/About';
 import Contact from './pages/Contact';
 import HelpPage from './pages/HelpPage';
 import Articles from './pages/Articles';
+import Calculator from './pages/Calculator';
 import Article from './pages/Article';
 import Wishlist from './pages/Wishlist';
 import Account from './pages/Account';
@@ -33,6 +34,7 @@ export default function App() {
       <Route path="/contact" element={<Contact />} />
       <Route path="/help/:slug" element={<HelpPage />} />
       <Route path="/articles" element={<Articles />} />
+      <Route path="/calculator" element={<Calculator />} />
       <Route path="/articles/:slug" element={<Article />} />
       <Route path="/wishlist" element={<Wishlist />} />
       <Route path="/account" element={<Account />} />

@@ -66,9 +66,9 @@ export default function Article() {
         <section className="artcta">
           <ArticleImage slug={a.slug} variant={a.art} className="artcta-art" />
           <div className="artcta-text">
-            <h2>{t('เลือกอาหารเปียกให้เจ้านาย')}</h2>
-            <p>{t('ดูอาหารแมวทั้งหมดในร้าน กรองตามอายุแมวได้ทันที')}</p>
-            <Link className="submit artcta-btn" to="/?cat=food">{t('ดูอาหารแมวในร้าน')}</Link>
+            <h2>{c.cta ? c.cta.title : t('เลือกอาหารเปียกให้เจ้านาย')}</h2>
+            <p>{c.cta ? c.cta.desc : t('ดูอาหารแมวทั้งหมดในร้าน กรองตามอายุแมวได้ทันที')}</p>
+            <Link className="submit artcta-btn" to={c.cta ? c.cta.to : '/?cat=food'}>{c.cta ? c.cta.label : t('ดูอาหารแมวในร้าน')}</Link>
           </div>
         </section>
 

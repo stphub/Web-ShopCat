@@ -1,6 +1,8 @@
 // บทความดูแลแมว: แต่ละเรื่องมีทั้งภาษาไทย (th) และอังกฤษ (en) ในที่เดียว หน้าเว็บเลือกตามปุ่มสลับภาษา
 // โครงของแต่ละหัวข้อ (sections): h = หัวข้อ, p = ย่อหน้า, ul/ol = รายการ, table = { head, rows }, tip = กล่องเคล็ดลับ
 // ข้อมูลเป็นแนวทางทั่วไป อ้างอิงคำแนะนำของสถาบันสัตวแพทย์ (เช่น Cornell Feline Health Center, VCA) ไม่ใช่คำวินิจฉัยของสัตวแพทย์
+import { ARTICLES2 } from './articles2';
+
 export const ARTICLES = [
   {
     slug: 'choose-wet-food',
@@ -342,5 +344,7 @@ export const ARTICLES = [
     },
   },
 ];
+
+ARTICLES.push(...ARTICLES2);
 
 export const ARTICLE_BY_SLUG = Object.fromEntries(ARTICLES.map((a) => [a.slug, a]));

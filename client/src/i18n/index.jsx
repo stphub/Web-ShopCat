@@ -4,12 +4,13 @@ import account from './en/account';
 import info from './en/info';
 import admin from './en/admin';
 import server from './en/server';
+import calc from './en/calc';
 
 // ระบบสองภาษา ไทย/อังกฤษ
 // - ข้อความต้นฉบับในโค้ดคือภาษาไทย ใช้เป็นคีย์ t('ข้อความไทย') ถ้าเป็นภาษาไทยคืนค่าเดิม
 // - ถ้าเป็นอังกฤษ จะหาในพจนานุกรม en/*.js ถ้าไม่เจอจะแสดงข้อความไทยเดิม (ไม่ทำให้หน้าพัง)
 // - ใส่ค่าแทรกได้ด้วย {ชื่อ}: t('ใส่ตะกร้าแล้ว {n} รายการ', { n: 3 })
-const DICT = { ...shop, ...account, ...info, ...admin, ...server };
+const DICT = { ...shop, ...account, ...info, ...admin, ...server, ...calc };
 
 let current = 'th';
 try {
